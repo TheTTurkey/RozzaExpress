@@ -1,0 +1,86 @@
+/* ============================================
+   Rosmini Tuckshop — Global Styles & Design Tokens
+   ============================================ */
+
+:root {
+  /* ---- Colour Palette ---- */
+  --clr-bg:        #0a0e1a;
+  --clr-surface:   #111827;
+  --clr-card:      rgba(255, 255, 255, 0.04);
+  --clr-card-hover:rgba(255, 255, 255, 0.08);
+  --clr-border:    rgba(255, 255, 255, 0.08);
+  --clr-border-hover: rgba(255, 255, 255, 0.18);
+
+  /* Accent — warm amber / orange for a tuckshop / food vibe */
+  --clr-accent:    #f59e0b;
+  --clr-accent-2:  #fb923c;
+  --clr-accent-glow: rgba(245, 158, 11, 0.25);
+
+  /* Student card — cool blue-purple */
+  --clr-student:      #6366f1;
+  --clr-student-light:#818cf8;
+  --clr-student-glow: rgba(99, 102, 241, 0.30);
+
+  /* Staff card — warm emerald */
+  --clr-staff:        #10b981;
+  --clr-staff-light:  #34d399;
+  --clr-staff-glow:   rgba(16, 185, 129, 0.30);
+
+  --clr-text:      #f1f5f9;
+  --clr-text-muted:#94a3b8;
+
+  /* ---- Typography ---- */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* ---- Spacing ---- */
+  --radius-sm:  8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* ---- Transitions ---- */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-med:  0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
