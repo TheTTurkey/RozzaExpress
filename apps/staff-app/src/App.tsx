@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Order, InventoryItem, User } from '@rozza-express/shared';
+import { Order, MenuItem, User } from '@rozza-express/shared';
 
 // Mock data typed using the shared interfaces
 const initialOrders: Order[] = [
@@ -10,9 +10,11 @@ const initialOrders: Order[] = [
       { itemId: 'INV-001', name: 'Steamed Pork Buns', price: 4.50, quantity: 2 },
       { itemId: 'INV-003', name: 'Chocolate Milk', price: 3.50, quantity: 1 }
     ],
+    totalPrice: 12.50,
     status: 'Pending',
-    deliveryTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    deliveryRunnerId: null
+    isPreOrder: false,
+    pickupTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    deliveryEta: new Date(Date.now() + 30 * 60 * 1000).toISOString()
   },
   {
     orderId: 'ORD-1002',
@@ -20,13 +22,15 @@ const initialOrders: Order[] = [
     items: [
       { itemId: 'INV-002', name: 'Margherita Pizza Slice', price: 4.00, quantity: 1 }
     ],
+    totalPrice: 4.00,
     status: 'Preparing',
-    deliveryTime: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-    deliveryRunnerId: 'RUN-009'
+    isPreOrder: true,
+    pickupTime: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    deliveryEta: new Date(Date.now() + 15 * 60 * 1000).toISOString()
   }
 ];
 
-const initialInventory: InventoryItem[] = [
+const initialInventory: MenuItem[] = [
   { itemId: 'INV-001', name: 'Steamed Pork Buns', price: 4.50, stockCount: 15, dietaryFilters: ['Soy', 'Gluten'] },
   { itemId: 'INV-002', name: 'Margherita Pizza Slice', price: 4.00, stockCount: 2, dietaryFilters: ['Dairy', 'Gluten'] },
   { itemId: 'INV-003', name: 'Chocolate Milk', price: 3.50, stockCount: 24, dietaryFilters: ['Dairy'] },
@@ -34,13 +38,13 @@ const initialInventory: InventoryItem[] = [
 ];
 
 const mockVoluntaryWorkers: User[] = [
-  { id: 'STU-0042', name: 'Austin (Back-end)', email: 'austin@rosmini.school.nz', walletBalance: 12.50, loyaltyPoints: 120, voluntaryHoursCount: 4.5 },
-  { id: 'STU-0077', name: 'Joseph (Front-end)', email: 'joseph@rosmini.school.nz', walletBalance: 8.20, loyaltyPoints: 80, voluntaryHoursCount: 8.0 }
+  { id: 'STU-0042', name: 'Austin (Back-end)', email: 'austin@rosmini.school.nz', walletBalance: 12.50, loyaltyPoints: 120, isDeliveryRunner: true, voluntaryHours: 4.5 },
+  { id: 'STU-0077', name: 'Joseph (Front-end)', email: 'joseph@rosmini.school.nz', walletBalance: 8.20, loyaltyPoints: 80, isDeliveryRunner: false, voluntaryHours: 8.0 }
 ];
 
 function App(): React.ReactElement {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
-  const [inventory] = useState<InventoryItem[]>(initialInventory);
+  const [inventory] = useState<MenuItem[]>(initialInventory);
 
   const advanceOrderStatus = (orderId: string) => {
     setOrders(prev => prev.map(order => {
@@ -106,7 +110,7 @@ function App(): React.ReactElement {
                       </div>
                     ))}
                   </td>
-                  <td>{new Date(order.deliveryTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  <td>{new Date(order.deliveryEta || order.pickupTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td>
                     <span className={getStatusBadgeClass(order.status)}>
                       {order.status}
@@ -193,7 +197,7 @@ function App(): React.ReactElement {
                     {worker.email}
                   </p>
                   <p style={{ fontSize: '0.85rem' }}>
-                    Hours Approved: <span style={{ fontWeight: 700, color: 'var(--clr-accent)' }}>{worker.voluntaryHoursCount}h</span>
+                    Hours Approved: <span style={{ fontWeight: 700, color: 'var(--clr-accent)' }}>{worker.voluntaryHours}h</span>
                   </p>
                 </div>
               ))}
