@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Preview - Rosmini Tuckshop" />
+    <title>RozzaExpress Standalone Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- React and Babel CDNs for browser-only preview -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      /* ============================================
+         Global Styling & Design Tokens
+         ============================================ */
+      :root {
+        --border-radius: 12px;
+        --clr-bg:        #0a0e1a;
+        --clr-surface:   #111827;
+        --clr-card:      rgba(255, 255, 255, 0.04);
+        --clr-card-hover:rgba(255, 255, 255, 0.08);
+        --clr-border:    rgba(255, 255, 255, 0.08);
+        --clr-border-hover: rgba(255, 255, 255, 0.18);
+        --clr-accent:    #f59e0b;
+        --clr-accent-2:  #fb923c;
+        --clr-accent-glow: rgba(245, 158, 11, 0.25);
+        --clr-student:      #6366f1;
+        --clr-student-light:#818cf8;
+        --clr-student-glow: rgba(99, 102, 241, 0.30);
+        --clr-text:      #f1f5f9;
+        --clr-text-muted:#94a3b8;
+        --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        --radius-sm:  8px;
+        --radius-md: 16px;
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+        --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-med:  0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background: #f8fafc;
+        color: #0f172a;
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: inherit;
+      }
+
+      /* ============================================
+         App Shell Layout (Ensures headers & footers persist)
+         ============================================ */
+      .app-shell {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding-bottom: 75px; /* Footer Nav height spacer */
+      }
+
+      /* ============================================
+         Login Screen Styles
+         ============================================ */
+      .login-page {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: var(--clr-bg);
+        color: var(--clr-text);
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      .login-bg-blob {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 0;
+        width: 400px;
+        height: 400px;
+      }
+
+      .login-bg-blob--1 {
+        background-color: var(--clr-student);
+        top: -10%;
+        left: -10%;
+      }
+
+      .login-bg-blob--2 {
+        background-color: #ef4444;
+        bottom: -10%;
+        right: -10%;
+      }
+
+      .login-card {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 440px;
+        background: var(--clr-surface);
+        border: 1px solid var(--clr-border);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(16px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .login-logo-container {
+        width: 64px;
+        height: 64px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .login-title {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.25rem;
+      }
+
+      .login-title-highlight {
+        background: linear-gradient(135deg, #ef4444, var(--clr-accent-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .login-subtitle {
+        font-size: 0.95rem;
+        color: var(--clr-text-muted);
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .login-error-alert {
+        width: 100%;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #f87171;
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius-sm);
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 1.5rem;
+      }
+
+      .error-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      .login-form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .input-group label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--clr-text);
+      }
+
+      .input-group input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--clr-border);
+        color: var(--clr-text);
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        border-color: #ef4444;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .input-hint {
+        font-size: 0.75rem;
+        color: var(--clr-text-muted);
+        line-height: 1.3;
+      }
+
+      .login-submit-btn {
+        width: 100%;
+        background: #ef4444;
+        color: #fff;
+        padding: 0.85rem 1.5rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+      }
+
+      .login-submit-btn:hover {
+        background: #dc2626;
+      }
+
+      /* ============================================
+         Header Styles (Global)
+         ============================================ */
+      .home-header {
+        background-color: #0a0f1d;
+        color: #fff;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+      }
+
+      .logo-badge {
+        background: #ef4444;
+        color: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 950;
+        font-size: 1.25rem;
+      }
+
+      .logo-title {
+        display: block;
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+      }
+
+      .logo-subtitle {
+        display: block;
+        font-size: 0.7rem;
+        color: #fbbf24;
+        font-weight: 500;
+      }
+
+      .header-nav {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .nav-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #94a3b8;
+        transition: color 0.2s, background 0.2s;
+      }
+
+      .nav-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-btn.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .points-pill {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+
+      .points-icon {
+        color: #fbbf24;
+      }
+
+      .points-count {
+        color: #fbbf24;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
+      .cart-pill {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fff;
+        padding: 0.45rem 1.25rem;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        position: relative;
+      }
+
+      .cart-count-badge {
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: -6px;
+        right: -4px;
+        border: 2px solid #0a0f1d;
+      }
+
+      /* ============================================
+         Home Dashboard Styles
+         ============================================ */
+      .hero-container {
+        background: linear-gradient(135deg, #0f1c3f 0%, #081026 100%);
+        padding: 3.5rem 4rem;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 3rem;
+      }
+
+      .hero-details {
+        flex: 1.2;
+      }
+
+      .hero-greeting {
+        font-size: 1.1rem;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
+      }
+
+      .hero-name {
+        font-size: 2.75rem;
+        font-weight: 850;
+        margin-bottom: 0.75rem;
+      }
+
+      .hero-desc {
+        font-size: 1.15rem;
+        color: #cbd5e1;
+        line-height: 1.5;
+        max-width: 500px;
+        margin-bottom: 2rem;
+      }
+
+      .hero-action-row {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .toggle-container {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.3rem;
+        border-radius: 999px;
+        display: flex;
+        gap: 0.25rem;
+      }
+
+      .toggle-btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .toggle-btn.active-amber {
+        background: #f59e0b;
+        color: #0f172a;
+      }
+
+      .toggle-btn.active-grey {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+      }
+
+      .order-now-btn {
+        background: #ef4444;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+      }
+
+      .hero-rewards-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        max-width: 360px;
+        width: 100%;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      }
+
+      .radial-progress-container {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+      }
+
+      .radial-progress-svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .progress-bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.08);
+        stroke-width: 8;
+      }
+
+      .progress-fill {
+        fill: none;
+        stroke: #fbbf24;
+        stroke-width: 8;
+        stroke-linecap: round;
+      }
+
+      .radial-progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .radial-points-icon {
+        font-size: 0.8rem;
+        color: #fbbf24;
+      }
+
+      .radial-points-val {
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .radial-points-lbl {
+        font-size: 0.65rem;
+        color: #94a3b8;
+      }
+
+      .rewards-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .rewards-summary h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .rewards-summary .rewards-hint {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        line-height: 1.4;
+      }
+
+      .rewards-summary .rewards-hint span {
+        color: #fbbf24;
+        font-weight: 700;
+      }
+
+      .earn-more-link {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-align: left;
+        margin-top: 0.5rem;
+      }
+
+      /* Sections */
+      .dashboard-section {
+        max-width: 1240px;
+        margin: 3rem auto 0 auto;
+        padding: 0 2rem;
+      }
+
+      .section-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .section-title-row h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .see-all-link {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #ef4444;
+        cursor: pointer;
+      }
+
+      .deals-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+      }
+
+      .deal-card {
+        background: #fff;
+        border-radius: var(--radius-md);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+      }
+
+      .deal-image-wrapper {
+        position: relative;
+        height: 150px;
+        background: #f1f5f9;
+      }
+
+      .deal-badge {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 10;
+        padding: 0.25rem 0.6rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .badge--discount { background: #ef4444; }
+      .badge--deal { background: #3b82f6; }
+      .badge--save { background: #0f172a; }
+      .badge--new { background: #8b5cf6; }
+
+      .deal-placeholder-img {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+      }
+
+      .food-emoji { font-size: 3.5rem; }
+
+      .deal-info {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .deal-info h4 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .deal-info p {
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+
+      .deal-points {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #d97706;
+        margin-top: 0.5rem;
+      }
+
+      /* Horizontal carousel */
+      .horizontal-scroll-container {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+      }
+
+      .recommended-card {
+        flex: 0 0 260px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      }
+
+      .recommended-card.card-disabled {
+        opacity: 0.65;
+      }
+
+      .rec-food-avatar {
+        width: 48px;
+        height: 48px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+      }
+
+      .rec-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        flex: 1;
+      }
+
+      .rec-info h5 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .rec-price {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+      }
+
+      .out-of-stock-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.08);
+        padding: 0.1rem 0.4rem;
+        border-radius: var(--radius-sm);
+        align-self: flex-start;
+      }
+
+      .stock-count-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #059669;
+      }
+
+      .add-to-cart-small {
+        width: 32px;
+        height: 32px;
+        background: #ef4444;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+      }
+
+      .add-to-cart-small:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+      }
+
+      /* Dietary tag selectors */
+      .dietary-filter-bar {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+      }
+
+      .filter-tag-pill {
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #cbd5e1;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .filter-tag-pill.active {
+        background: #0f172a;
+        color: #fff;
+        border-color: #0f172a;
+      }
+
+      /* Menu Grid */
+      .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+      }
+
+      .menu-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .menu-card.card-disabled {
+        opacity: 0.75;
+      }
+
+      .menu-card-image {
+        height: 140px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .menu-food-emoji { font-size: 4rem; }
+
+      .out-of-stock-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.7);
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu-card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 1rem;
+      }
+
+      .menu-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .menu-card-header h4 { font-weight: 750; font-size: 1.15rem; }
+
+      .menu-price { font-weight: 800; font-size: 1.15rem; }
+
+      .menu-card-tags {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .menu-dietary-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 0.2rem 0.5rem;
+        border-radius: var(--radius-sm);
+      }
+
+      .menu-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 1rem;
+      }
+
+      .stock-indicator { font-size: 0.8rem; font-weight: 600; }
+      .stock-indicator.healthy { color: #059669; }
+      .stock-indicator.critical { color: #d97706; }
+      .stock-indicator.extinct { color: #ef4444; }
+
+      .menu-add-btn {
+        background: #0f172a;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+      }
+
+      .menu-add-btn:disabled {
+        background: #cbd5e1;
+        color: #94a3b8;
+        cursor: not-allowed;
+      }
+
+      /* ============================================
+         Wallet & Loyalty Styles
+         ============================================ */
+      .wallet-layout {
+        max-width: 1240px;
+        margin: 3rem auto 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 2fr 1.1fr;
+        gap: 2.5rem;
+      }
+
+      .digital-wallet-card {
+        position: relative;
+        height: 220px;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 15px 35px rgba(30, 58, 138, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .wallet-chip {
+        width: 45px;
+        height: 32px;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border-radius: var(--radius-sm);
+      }
+
+      .wallet-issuer {
+        font-weight: 900;
+        font-size: 1.1rem;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.7);
+      }
+
+      .balance-label { font-size: 0.8rem; color: #94a3b8; }
+      .balance-amount { font-size: 2.5rem; font-weight: 850; }
+
+      .wallet-card-footer { display: flex; justify-content: space-between; }
+      .card-holder-lbl { font-size: 0.6rem; color: #64748b; }
+      .card-holder-name { font-size: 0.9rem; font-weight: 700; }
+
+      .wallet-section-box {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        margin-top: 2rem;
+      }
+
+      .wallet-section-box h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+
+      .topup-options-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .topup-amount-btn {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        color: #0f172a;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding: 1rem;
+        border-radius: var(--radius-md);
+      }
+
+      .topup-amount-btn:hover {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .secure-checkout-notice {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.8rem;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 1.25rem;
+      }
+
+      .memberships-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+      }
+
+      .membership-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .recommended-border { border-color: #fbbf24; background: #fff; }
+
+      .rec-ribbon {
+        position: absolute;
+        top: 10px;
+        right: -30px;
+        background: #fbbf24;
+        color: #0f172a;
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 0.25rem 2rem;
+        transform: rotate(45deg);
+      }
+
+      .plan-price-row { display: flex; align-items: baseline; color: #0f172a; }
+      .price-value { font-size: 2.25rem; font-weight: 850; }
+
+      .plan-features-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin: 1.5rem 0 2rem 0; }
+      .plan-features-list li { font-size: 0.8rem; color: #475569; display: flex; gap: 0.4rem; }
+
+      .plan-select-btn {
+        width: 100%;
+        padding: 0.65rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+
+      .loyalty-box-card {
+        background: #0a0f1d;
+        color: #fff;
+        border-radius: var(--radius-md);
+        padding: 2.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+      }
+
+      .loyalty-box-header { display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 1rem; }
+      .loyalty-lightning { color: #fbbf24; font-size: 1.5rem; }
+
+      .loyalty-points-stats .stat-value { font-size: 2.75rem; font-weight: 900; }
+      .loyalty-points-stats .stat-value span { font-size: 1.1rem; color: #fbbf24; }
+
+      .loyalty-progress-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; }
+      .loyalty-progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; }
+      .loyalty-progress-bar-fill { height: 100%; background: #fbbf24; transition: width 0.3s; }
+
+      .loyalty-earning-rules { background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 1.25rem; }
+      .rule-item { display: flex; gap: 0.75rem; }
+      .rule-number { width: 24px; height: 24px; background: rgba(255,255,255,0.06); border-radius: 50%; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; color: #fbbf24; }
+      .rule-title { font-weight: 650; font-size: 0.85rem; }
+      .rule-desc { font-size: 0.75rem; color: #94a3b8; }
+
+      .view-rewards-catalog-btn { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.85rem; border-radius: var(--radius-sm); }
+
+      /* ============================================
+         Tracking Screen Styles
+         ============================================ */
+      .tracking-layout {
+        max-width: 1240px;
+        margin: 3rem auto 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 2fr 1.1fr;
+        gap: 2.5rem;
+      }
+
+      .active-order-tracking-card {
+        border: 1px solid #cbd5e1;
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .tracking-card-header { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 1.25rem; }
+
+      .eta-badge {
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        color: #d97706;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+
+      .tracking-steps-container { display: flex; justify-content: space-between; position: relative; padding: 0 1rem; }
+      .progress-line { position: absolute; top: 20px; left: 2rem; right: 2rem; height: 4px; background: #cbd5e1; z-index: 1; }
+      .progress-line-fill { height: 100%; background: #ef4444; }
+
+      .step-node { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; position: relative; z-index: 2; width: 80px; }
+      .step-icon-wrap { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 4px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+      .step-label { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+
+      .step-node.done .step-icon-wrap { border-color: #ef4444; }
+      .step-node.done .step-label { color: #0f172a; }
+
+      .step-node.active-pulse .step-icon-wrap {
+        border-color: #ef4444;
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .step-node.active-pulse .step-label { color: #ef4444; }
+
+      .hackathon-simulation-panel {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-sm);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .simulation-tag { background: #475569; color: #fff; font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; align-self: flex-start; }
+      .simulate-next-btn { background: #0f172a; color: #fff; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 1rem; border-radius: var(--radius-sm); align-self: flex-start; }
+
+      .voluntary-hours-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        padding: 2.5rem 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .runner-avatar-wrapper { position: relative; margin-bottom: 1rem; }
+      .runner-avatar { width: 80px; height: 80px; background: var(--clr-student); color: #fff; border-radius: 50%; font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+      .certified-badge { position: absolute; bottom: 0; right: 0; background: #10b981; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; border: 2px solid #fff; }
+
+      .tag-runner { font-size: 0.7rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 999px; text-transform: uppercase; }
+      .tag-runner.active { background: rgba(16, 185, 129, 0.1); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+      .voluntary-stats-box { width: 100%; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); display: flex; padding: 1.25rem; margin: 1.5rem 0; }
+      .stat-item { flex: 1; display: flex; flex-direction: column; }
+      .stat-number { font-size: 1.5rem; font-weight: 850; }
+      .stat-divider { width: 1px; background: #e2e8f0; align-self: stretch; }
+
+      .voluntary-level-detail { width: 100%; border-top: 1px solid #f1f5f9; padding-top: 1.5rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+      .hours-progress-bar-bg { width: 100%; height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+      .hours-progress-bar-fill { height: 100%; background: #10b981; }
+
+      .runner-delivery-history { width: 100%; border-top: 1px solid #f1f5f9; padding-top: 1.5rem; margin-top: 1.5rem; text-align: left; display: flex; flex-direction: column; gap: 0.75rem; }
+      .delivery-log-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
+      .log-time { color: #059669; font-weight: 700; }
+
+      .footer-nav-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #0a0f1d;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        height: 70px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 999;
+      }
+
+      .footer-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        font-weight: 600;
+        width: 60px;
+      }
+
+      .footer-nav-item.active {
+        color: #ef4444;
+      }
+
+      .footer-nav-icon {
+        font-size: 1.35rem;
+      }
+
+      /* ============================================
+         Cart Slide-out Drawer
+         ============================================ */
+      .cart-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 2000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      .cart-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .cart-drawer {
+        position: fixed;
+        top: 0;
+        right: -420px;
+        bottom: 0;
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        z-index: 2001;
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        padding: 2.25rem;
+        color: #0f172a;
+        transition: right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .cart-drawer.open {
+        right: 0;
+      }
+
+      .cart-drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .cart-drawer-header h3 {
+        font-size: 1.25rem;
+        font-weight: 800;
+      }
+
+      .close-cart-btn {
+        font-size: 1.75rem;
+        color: #64748b;
+        line-height: 1;
+      }
+
+      .cart-items-list {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .cart-item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 1rem;
+      }
+
+      .cart-item-info h5 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .cart-item-info p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.15rem;
+      }
+
+      .cart-qty-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: #f1f5f9;
+        padding: 0.35rem 0.75rem;
+        border-radius: 99px;
+      }
+
+      .qty-change-btn {
+        font-weight: 800;
+        font-size: 1rem;
+        color: #475569;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .qty-value {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .cart-checkout-box {
+        border-top: 1px solid #e2e8f0;
+        padding-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .cart-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      .cart-total-value {
+        font-size: 1.25rem;
+        color: #ef4444;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        background: #ef4444;
+        color: #fff;
+        font-weight: 700;
+        padding: 0.9rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        transition: background 0.2s;
+      }
+
+      .checkout-btn:hover {
+        background: #dc2626;
+      }
+
+      .checkout-btn:disabled {
+        background: #cbd5e1;
+        color: #94a3b8;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      .cart-error-banner {
+        background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.2);
+        color: #ef4444;
+        font-size: 0.8rem;
+        padding: 0.75rem;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .empty-cart-msg {
+        text-align: center;
+        color: #64748b;
+        margin-top: 3rem;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useMemo } = React;
+
+      // ============================================
+      // Validation Logic
+      // ============================================
+      function validateRosminiSignIn(email, name) {
+        const cleanEmail = email.trim().toLowerCase();
+        const parts = cleanEmail.split('@');
+        
+        if (parts.length !== 2) {
+          throw new Error('Invalid email format. Please check your spelling.');
+        }
+        
+        const [localPart, domain] = parts;
+        const isCorrectDomain = domain === 'rosmini.school.nz';
+        const startsWithDigit = /^\d/.test(localPart);
+
+        if (!isCorrectDomain || !startsWithDigit) {
+          throw new Error('Email must be a Rosmini College student email starting with a number (e.g., 22235@rosmini.school.nz)');
+        }
+
+        const studentId = `STU-${localPart}`;
+        return {
+          id: studentId,
+          name: name.trim() || 'Josh Tuilagi',
+          email: cleanEmail
+        };
+      }
+
+      // ============================================
+      // Login Component
+      // ============================================
+      function Login({ onLoginSuccess }) {
+        const [email, setEmail] = useState('');
+        const [name, setName] = useState('');
+        const [error, setError] = useState('');
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          setError('');
+
+          try {
+            const validatedUser = validateRosminiSignIn(email, name);
+            onLoginSuccess(validatedUser);
+          } catch (err) {
+            setError(err.message);
+          }
+        };
+
+        return (
+          <div className="login-page">
+            <div className="login-bg-blob login-bg-blob--1" />
+            <div className="login-bg-blob login-bg-blob--2" />
+
+            <div className="login-card">
+              <div className="login-logo-container">
+                <span>🍕</span>
+              </div>
+              
+              <h1 className="login-title">
+                Rozza <span className="login-title-highlight">Express</span>
+              </h1>
+              <p className="login-subtitle">Rosmini College Student Sign-in</p>
+
+              {error && (
+                <div className="login-error-alert" id="login-error-message">
+                  <svg viewBox="0 0 24 24" className="error-icon" fill="none" stroke="currentColor" strokeWidth="2.5" style={{width: 20, height: 20}}>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="login-form">
+                <div className="input-group">
+                  <label htmlFor="student-name">Full Name</label>
+                  <input
+                    type="text"
+                    id="student-name"
+                    placeholder="e.g., Josh Tuilagi"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label htmlFor="student-email">Rosmini Student Email</label>
+                  <input
+                    type="text"
+                    id="student-email"
+                    placeholder="e.g., 22235@rosmini.school.nz"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <small className="input-hint">Must begin with your student number and end with @rosmini.school.nz</small>
+                </div>
+
+                <button type="submit" className="login-submit-btn">
+                  Sign in with Google
+                </button>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // ============================================
+      // Home Component
+      // ============================================
+      const TODAY_DEALS = [
+        { id: 'deal-1', badgeText: '50% OFF', badgeType: 'discount', title: '2-for-1 Juicies', desc: 'Interval only · Expires 1:10pm', points: 80, imageUrl: '🍊' },
+        { id: 'deal-2', badgeText: 'DEAL', badgeType: 'deal', title: 'Cheeseburger Deal', desc: 'Add a drink for $1.50', points: 120, imageUrl: '🍔' },
+        { id: 'deal-3', badgeText: 'SAVE $1', badgeType: 'save', title: 'Sausage Roll Combo', desc: 'Sausage roll + chips', points: 60, imageUrl: '🥖' },
+        { id: 'deal-4', badgeText: 'NEW', badgeType: 'new', title: 'Smash Burger Special', desc: 'Double smash, special sauce', points: 110, imageUrl: '🍔' }
+      ];
+
+      const RECOMMENDED_ITEMS = [
+        { itemId: 'rec-1', name: 'Steamed Pork Buns', price: 4.50, stockCount: 12, dietaryFilters: ['Soy', 'Gluten'] },
+        { itemId: 'rec-2', name: 'Chocolate Milk', price: 3.50, stockCount: 8, dietaryFilters: ['Dairy'] },
+        { itemId: 'rec-3', name: 'Garlic Bread Slice', price: 2.00, stockCount: 0, dietaryFilters: ['Gluten', 'Dairy', 'Vegetarian'] },
+        { itemId: 'rec-4', name: 'Hot Chips (Cup)', price: 3.00, stockCount: 20, dietaryFilters: ['Vegetarian'] }
+      ];
+
+      const MENU_ITEMS = [
+        { itemId: 'menu-1', name: 'Butter Chicken & Rice', price: 6.50, stockCount: 15, dietaryFilters: ['Gluten-Free'] },
+        { itemId: 'menu-2', name: 'Mince & Cheese Pie', price: 4.50, stockCount: 4, dietaryFilters: ['Gluten', 'Dairy'] },
+        { itemId: 'menu-3', name: 'Vegetarian Sushi Roll', price: 5.00, stockCount: 0, dietaryFilters: ['Gluten-Free', 'Vegetarian'] },
+        { itemId: 'menu-4', name: 'Rosmini College Sausage Roll', price: 3.20, stockCount: 35, dietaryFilters: ['Gluten'] },
+        { itemId: 'menu-5', name: 'Fresh Fruit Cup', price: 2.50, stockCount: 10, dietaryFilters: ['Vegetarian', 'Gluten-Free'] },
+        { itemId: 'menu-6', name: 'Chocolate Fudge Brownie', price: 3.00, stockCount: 0, dietaryFilters: ['Gluten', 'Dairy', 'Nut-Free'] }
+      ];
+
+      function Home({ currentUser, onAddToCart, onNavigate }) {
+        const [orderMode, setOrderMode] = useState('pre-order');
+        const [selectedDietaryTags, setSelectedDietaryTags] = useState([]);
+
+        const handleTagToggle = (tag) => {
+          setSelectedDietaryTags(prev => 
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+          );
+        };
+
+        const filteredMenuItems = useMemo(() => {
+          if (selectedDietaryTags.length === 0) return MENU_ITEMS;
+          return MENU_ITEMS.filter(item => 
+            selectedDietaryTags.every(tag => 
+              item.dietaryFilters.some(filter => filter.toLowerCase().includes(tag.toLowerCase()))
+            )
+          );
+        }, [selectedDietaryTags]);
+
+        const radius = 45;
+        const circumference = 2 * Math.PI * radius;
+        const pointsPercent = Math.min((currentUser.loyaltyPoints / 500) * 100, 100);
+        const strokeDashoffset = circumference - (pointsPercent / 100) * circumference;
+
+        return (
+          <div className="home-screen-content">
+            <div className="hero-container">
+              <div className="hero-details">
+                <p className="hero-greeting">Good afternoon,</p>
+                <h2 className="hero-name">{currentUser.name} 👋</h2>
+                <p className="hero-desc">
+                  Order your interval & lunch from Rosmini's tuck shop — skip the queue, earn points.
+                </p>
+
+                <div className="hero-action-row">
+                  <div className="toggle-container">
+                    <button 
+                      className={`toggle-btn ${orderMode === 'pre-order' ? 'active-amber' : ''}`}
+                      onClick={() => setOrderMode('pre-order')}
+                    >
+                      🕒 Pre-Order
+                    </button>
+                    <button 
+                      className={`toggle-btn ${orderMode === 'delivery' ? 'active-grey' : ''}`}
+                      onClick={() => setOrderMode('delivery')}
+                    >
+                      📦 Delivery
+                    </button>
+                  </div>
+                  <button className="order-now-btn">Order Now &rarr;</button>
+                </div>
+              </div>
+
+              <div className="hero-rewards-card" onClick={() => onNavigate('Wallet')}>
+                <div className="radial-progress-container">
+                  <svg className="radial-progress-svg" viewBox="0 0 100 100">
+                    <circle className="progress-bg" cx="50" cy="50" r={radius} />
+                    <circle 
+                      className="progress-fill" 
+                      cx="50" 
+                      cy="50" 
+                      r={radius}
+                      strokeDasharray={circumference}
+                      strokeDashoffset={strokeDashoffset}
+                      transform="rotate(-90 50 50)"
+                    />
+                  </svg>
+                  <div className="radial-progress-text">
+                    <span className="radial-points-icon">⚡</span>
+                    <span className="radial-points-val">{currentUser.loyaltyPoints}</span>
+                    <span className="radial-points-lbl">pts</span>
+                  </div>
+                </div>
+
+                <div className="rewards-summary">
+                  <h3>Rozza Rewards</h3>
+                  <p className="rewards-hint">
+                    <span>{500 - currentUser.loyaltyPoints} pts</span> to a free sausage roll!
+                  </p>
+                  <button className="earn-more-link">Earn more &gt;</button>
+                </div>
+              </div>
+            </div>
+
+            <section className="dashboard-section">
+              <div className="section-title-row">
+                <h3>Today's Deals</h3>
+                <span className="see-all-link">See all &gt;</span>
+              </div>
+
+              <div className="deals-grid">
+                {TODAY_DEALS.map((deal) => (
+                  <div key={deal.id} className="deal-card">
+                    <div className="deal-image-wrapper">
+                      <span className={`deal-badge badge--${deal.badgeType}`}>{deal.badgeText}</span>
+                      <div className="deal-placeholder-img">
+                        <span className="food-emoji">{deal.imageUrl}</span>
+                      </div>
+                    </div>
+                    <div className="deal-info">
+                      <h4>{deal.title}</h4>
+                      <p>{deal.desc}</p>
+                      <span className="deal-points">+{deal.points} pts</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="dashboard-section">
+              <div className="section-title-row">
+                <h3>Recommended Buys</h3>
+              </div>
+
+              <div className="horizontal-scroll-container">
+                {RECOMMENDED_ITEMS.map((item) => {
+                  const isOutOfStock = item.stockCount === 0;
+                  return (
+                    <div key={item.itemId} className={`recommended-card ${isOutOfStock ? 'card-disabled' : ''}`}>
+                      <div className="rec-food-avatar">🍔</div>
+                      <div className="rec-info">
+                        <h5>{item.name}</h5>
+                        <p className="rec-price">${item.price.toFixed(2)}</p>
+                        {isOutOfStock ? <span className="out-of-stock-badge">Out of Stock</span> : <span className="stock-count-label">{item.stockCount} left</span>}
+                      </div>
+                      <button 
+                        className="add-to-cart-small"
+                        disabled={isOutOfStock}
+                        onClick={() => onAddToCart(item)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="dashboard-section">
+              <div className="section-title-row">
+                <h3>Tuckshop Menu</h3>
+              </div>
+
+              <div className="dietary-filter-bar">
+                {['Gluten-Free', 'Nut-Free', 'Vegetarian', 'Dairy-Free'].map((tag) => {
+                  const isActive = selectedDietaryTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      className={`filter-tag-pill ${isActive ? 'active' : ''}`}
+                      onClick={() => handleTagToggle(tag)}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="menu-grid">
+                {filteredMenuItems.map((item) => {
+                  const isOutOfStock = item.stockCount === 0;
+                  return (
+                    <div key={item.itemId} className={`menu-card ${isOutOfStock ? 'card-disabled' : ''}`}>
+                      <div className="menu-card-image">
+                        {isOutOfStock && <div className="out-of-stock-overlay">Out of Stock</div>}
+                        <span className="menu-food-emoji">🍕</span>
+                      </div>
+                      
+                      <div className="menu-card-body">
+                        <div className="menu-card-header">
+                          <h4>{item.name}</h4>
+                          <span className="menu-price">${item.price.toFixed(2)}</span>
+                        </div>
+                        <div className="menu-card-tags">
+                          {item.dietaryFilters.map(tag => (
+                            <span key={tag} className="menu-dietary-badge">{tag}</span>
+                          ))}
+                        </div>
+                        <div className="menu-card-footer">
+                          <span className={`stock-indicator ${isOutOfStock ? 'extinct' : item.stockCount <= 5 ? 'critical' : 'healthy'}`}>
+                            {isOutOfStock ? 'Sold Out' : `${item.stockCount} items left`}
+                          </span>
+                          <button 
+                            className="menu-add-btn"
+                            disabled={isOutOfStock}
+                            onClick={() => onAddToCart(item)}
+                          >
+                            {isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        );
+      }
+
+      // ============================================
+      // Wallet Component
+      // ============================================
+      const MEMBERSHIP_PLANS = [
+        { id: 'plan-1', name: 'Weekly Lunch Pass', price: 25.00, period: 'week', features: ['1 Custom Hot Main per day', '1 Cold drink per day', 'Skip the queue', '+50 loyalty points'], recommended: true, accentColor: '#ef4444' },
+        { id: 'plan-2', name: 'Voluntary Helper Club', price: 15.00, period: 'week', features: ['Available to runners only', 'Free Friday cookie', 'Double points on delivery'], recommended: false, accentColor: '#10b981' },
+        { id: 'plan-3', name: 'VIP Golden Pass', price: 90.00, period: 'month', features: ['Unlimited mains & snacks', 'Free homeroom delivery', 'VIP tasting invitation'], recommended: false, accentColor: '#fbbf24' }
+      ];
+
+      function Wallet({ currentUser, onTopUp, onNavigate }) {
+        const progressPercent = Math.min((currentUser.loyaltyPoints / 500) * 100, 100);
+
+        return (
+          <div className="wallet-screen-content">
+            <div className="wallet-layout">
+              <div className="wallet-main-col">
+                <div className="digital-wallet-card">
+                  <div className="wallet-card-overlay" />
+                  <div className="wallet-card-header">
+                    <span className="wallet-chip"></span>
+                    <span className="wallet-issuer">ROZZA PAY</span>
+                  </div>
+                  <div className="wallet-balance-row">
+                    <p className="balance-label">Available Balance</p>
+                    <h2 className="balance-amount">${currentUser.walletBalance.toFixed(2)}</h2>
+                  </div>
+                  <div className="wallet-card-footer">
+                    <div>
+                      <p className="card-holder-lbl">CARD HOLDER</p>
+                      <p className="card-holder-name">{currentUser.name}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <section className="wallet-section-box">
+                  <h3>Secure Top-up Funds</h3>
+                  <p className="section-hint-text">Simulate a quick tuition deposit for testing:</p>
+                  <div className="topup-options-grid">
+                    {[5, 10, 20, 50].map((amount) => (
+                      <button key={amount} className="topup-amount-btn" onClick={() => onTopUp(amount)}>
+                        +${amount}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="wallet-section-box">
+                  <h3>Tuckshop Memberships</h3>
+                  <div className="memberships-grid">
+                    {MEMBERSHIP_PLANS.map((plan) => (
+                      <div key={plan.id} className={`membership-card ${plan.recommended ? 'recommended-border' : ''}`}>
+                        {plan.recommended && <div className="rec-ribbon">Best Value</div>}
+                        <h4>{plan.name}</h4>
+                        <div className="plan-price-row">
+                          <span className="price-value">${plan.price}</span>
+                          <span>/{plan.period}</span>
+                        </div>
+                        <ul className="plan-features-list">
+                          {plan.features.map((f, i) => <li key={i}>✓ {f}</li>)}
+                        </ul>
+                        <button className="plan-select-btn" style={{backgroundColor: plan.recommended ? '#fbbf24' : 'rgba(255,255,255,0.05)'}}>Subscribe</button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <div className="wallet-side-col">
+                <section className="loyalty-box-card">
+                  <div className="loyalty-box-header">
+                    <span className="loyalty-lightning">⚡</span>
+                    <h3>Loyalty Balance</h3>
+                  </div>
+                  <div className="loyalty-points-stats">
+                    <h2 className="stat-value">{currentUser.loyaltyPoints} <span>pts</span></h2>
+                  </div>
+                  <div className="loyalty-progress-container">
+                    <div className="loyalty-progress-labels">
+                      <span>Bronze Tier</span>
+                      <span>500 pts Goal</span>
+                    </div>
+                    <div className="loyalty-progress-bar-bg">
+                      <div className="loyalty-progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <p className="loyalty-progress-detail">
+                      Only <strong>{500 - currentUser.loyaltyPoints} pts</strong> to a free sausage roll!
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ============================================
+      // Tracking Component
+      // ============================================
+      function Tracking({ currentUser, activeOrder, onAdvanceOrder }) {
+        const steps = ['Pending', 'Preparing', 'In-Transit', 'Completed'];
+        const currentIdx = activeOrder ? steps.indexOf(activeOrder.status) : 0;
+
+        return (
+          <div className="tracking-screen-content">
+            <div className="tracking-layout">
+              <div className="tracking-main-col">
+                <section className="tracking-section-box">
+                  <h3>Live Order Tracker</h3>
+                  
+                  {!activeOrder ? (
+                    <div className="empty-tracking-state" style={{textAlign: 'center', padding: '3rem'}}>
+                      <span>📦</span>
+                      <p style={{color: '#64748b', marginTop: '1rem'}}>No active orders. Add items and checkout to begin tracking!</p>
+                    </div>
+                  ) : (
+                    <div className="active-order-tracking-card" style={{marginTop: '1.5rem'}}>
+                      <div className="tracking-card-header">
+                        <div>
+                          <h4>Order: <span className="highlight-text">{activeOrder.orderId}</span></h4>
+                          <p className="items-summary">
+                            {activeOrder.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
+                          </p>
+                        </div>
+                        {activeOrder.status === 'In-Transit' ? (
+                          <div className="eta-badge">🛵 Arriving in 8 mins</div>
+                        ) : (
+                          <div className="eta-badge">{activeOrder.status}</div>
+                        )}
+                      </div>
+
+                      <div className="tracking-steps-container">
+                        <div className="progress-line">
+                          <div className="progress-line-fill" style={{ width: `${(currentIdx / 3) * 100}%` }} />
+                        </div>
+                        {steps.map((s, idx) => (
+                          <div key={s} className={`step-node ${idx <= currentIdx ? 'done' : ''} ${idx === currentIdx ? 'active-pulse' : ''}`}>
+                            <div className="step-icon-wrap">
+                              {idx === 0 ? '📝' : idx === 1 ? '🍳' : idx === 2 ? '🛵' : '✅'}
+                            </div>
+                            <span className="step-label">{s}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="hackathon-simulation-panel">
+                        <span className="simulation-tag">SIMULATOR</span>
+                        <p>Manually advance the order delivery state:</p>
+                        <button className="simulate-next-btn" onClick={onAdvanceOrder}>Advance Status</button>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              </div>
+
+              <div className="tracking-side-col">
+                <section className="voluntary-hours-card">
+                  <div className="runner-avatar-wrapper">
+                    <div className="runner-avatar">JT</div>
+                    <span className="certified-badge">⚡</span>
+                  </div>
+                  <h3>{currentUser.name}</h3>
+                  <p className="runner-email">{currentUser.email}</p>
+                  <div className="runner-status-tag" style={{marginTop: 10}}>
+                    <span className="tag-runner active">Certified Delivery Runner</span>
+                  </div>
+
+                  <div className="voluntary-stats-box">
+                    <div className="stat-item">
+                      <span className="stat-number">{currentUser.voluntaryHours.toFixed(1)}</span>
+                      <span className="stat-label">Hours</span>
+                    </div>
+                    <div className="stat-divider"></div>
+                    <div className="stat-item">
+                      <span className="stat-number">10%</span>
+                      <span className="stat-label">Discount</span>
+                    </div>
+                  </div>
+
+                  <div className="voluntary-level-detail">
+                    <p className="hours-progress-hint">🏆 Silver Level Service Helper</p>
+                    <div className="hours-progress-bar-bg">
+                      <div className="hours-progress-bar-fill" style={{ width: '66%' }} />
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ============================================
+      // Main App Component with persistent Header & Footer Nav
+      // ============================================
+      function App() {
+        const [currentScreen, setCurrentScreen] = useState('Login');
+        const [currentUser, setCurrentUser] = useState(null);
+        
+        // Cart State
+        // Array of order items: { itemId, name, price, quantity }
+        const [cart, setCart] = useState([]);
+        const [cartOpen, setCartOpen] = useState(false);
+        const [cartError, setCartError] = useState('');
+
+        // Active Order State
+        const [activeOrder, setActiveOrder] = useState(null);
+
+        const handleLogin = (user) => {
+          setCurrentUser({
+            ...user,
+            walletBalance: 25.50,
+            loyaltyPoints: 425,
+            isDeliveryRunner: true,
+            voluntaryHours: 8.0
+          });
+          setCurrentScreen('Home');
+        };
+
+        const handleTopUp = (amount) => {
+          setCurrentUser(prev => prev ? { ...prev, walletBalance: prev.walletBalance + amount } : null);
+        };
+
+        // Adds item to shopping cart and handles stock checks locally
+        const handleAddToCart = (item) => {
+          setCart(prev => {
+            const exists = prev.find(i => i.itemId === item.itemId);
+            if (exists) {
+              return prev.map(i => i.itemId === item.itemId ? { ...i, quantity: i.quantity + 1 } : i);
+            }
+            return [...prev, { itemId: item.itemId, name: item.name, price: item.price, quantity: 1 }];
+          });
+        };
+
+        const updateCartQty = (itemId, change) => {
+          setCart(prev => prev.map(i => {
+            if (i.itemId !== itemId) return i;
+            const nextQty = i.quantity + change;
+            return nextQty > 0 ? { ...i, quantity: nextQty } : null;
+          }).filter(Boolean));
+        };
+
+        // Calculates cart totals
+        const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        // Executes Checkout process
+        const handleCheckout = () => {
+          setCartError('');
+          if (!currentUser) return;
+
+          if (currentUser.walletBalance < cartTotal) {
+            setCartError('Insufficient wallet balance. Top up in the Wallet tab.');
+            return;
+          }
+
+          // Deduct from wallet, add loyalty points (1 point per dollar spent)
+          const pointsEarned = Math.round(cartTotal);
+          setCurrentUser(prev => prev ? {
+            ...prev,
+            walletBalance: prev.walletBalance - cartTotal,
+            loyaltyPoints: prev.loyaltyPoints + pointsEarned
+          } : null);
+
+          // Spawn new order to track
+          const newOrder = {
+            orderId: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
+            studentId: currentUser.id,
+            items: [...cart],
+            totalPrice: cartTotal,
+            status: 'Pending',
+            isPreOrder: false,
+            pickupTime: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+            deliveryEta: null
+          };
+
+          setActiveOrder(newOrder);
+          setCart([]); // Clear cart
+          setCartOpen(false); // Close cart drawer
+          setCurrentScreen('Tracking'); // Auto-route to live tracking
+        };
+
+        // Simulator runner status trigger ( Liam T )
+        const handleAdvanceOrder = () => {
+          if (!activeOrder) return;
+          setActiveOrder(prev => {
+            if (!prev) return null;
+            let nextStatus = prev.status;
+            if (prev.status === 'Pending') nextStatus = 'Preparing';
+            else if (prev.status === 'Preparing') nextStatus = 'In-Transit';
+            else if (prev.status === 'In-Transit') nextStatus = 'Completed';
+            else nextStatus = 'Pending';
+
+            return {
+              ...prev,
+              status: nextStatus
+            };
+          });
+        };
+
+        if (currentScreen === 'Login' || !currentUser) {
+          return <Login onLoginSuccess={handleLogin} />;
+        }
+
+        return (
+          <div className="app-shell">
+            {/* PERSISTENT HEADER (Navbar identical on all screens) */}
+            <header className="home-header">
+              <div className="header-logo" onClick={() => setCurrentScreen('Home')}>
+                <div className="logo-badge">R</div>
+                <div>
+                  <span className="logo-title">Rozza Express</span>
+                  <span className="logo-subtitle">Rosmini College Tuck Shop</span>
+                </div>
+              </div>
+
+              <nav className="header-nav">
+                <button className={`nav-btn ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>Home</button>
+                <button className={`nav-btn ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>Wallet</button>
+                <button className={`nav-btn ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>Tracking</button>
+              </nav>
+
+              <div className="header-actions">
+                <div className="points-pill" onClick={() => setCurrentScreen('Wallet')}>
+                  <span className="points-icon">⚡</span>
+                  <span className="points-count">{currentUser.loyaltyPoints} pts</span>
+                </div>
+                <button className="cart-pill" onClick={() => setCartOpen(true)}>
+                  <span className="cart-text">Cart</span>
+                  {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
+                </button>
+              </div>
+            </header>
+
+            {/* SCREEN RENDERING */}
+            {currentScreen === 'Home' && (
+              <Home 
+                currentUser={currentUser} 
+                onAddToCart={handleAddToCart} 
+                onNavigate={setCurrentScreen} 
+              />
+            )}
+            
+            {currentScreen === 'Wallet' && (
+              <Wallet 
+                currentUser={currentUser} 
+                onTopUp={handleTopUp} 
+                onNavigate={setCurrentScreen} 
+              />
+            )}
+
+            {currentScreen === 'Tracking' && (
+              <Tracking 
+                currentUser={currentUser} 
+                activeOrder={activeOrder}
+                onAdvanceOrder={handleAdvanceOrder}
+              />
+            )}
+
+            {/* PERSISTENT BOTTOM NAVIGATION BAR */}
+            <footer className="footer-nav-bar">
+              <button className={`footer-nav-item ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>
+                <span className="footer-nav-icon">🏠</span>
+                <span>Home</span>
+              </button>
+              <button className={`footer-nav-item ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>
+                <span className="footer-nav-icon">💳</span>
+                <span>Wallet</span>
+              </button>
+              <button className={`footer-nav-item ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>
+                <span className="footer-nav-icon">📍</span>
+                <span>Tracking</span>
+              </button>
+            </footer>
+
+            {/* CART DRAWER BACKDROP */}
+            <div className={`cart-overlay ${cartOpen ? 'open' : ''}`} onClick={() => setCartOpen(false)} />
+
+            {/* CART DRAWER MODAL */}
+            <div className={`cart-drawer ${cartOpen ? 'open' : ''}`}>
+              <div className="cart-drawer-header">
+                <h3>Shopping Cart</h3>
+                <button className="close-cart-btn" onClick={() => { setCartOpen(false); setCartError(''); }}>&times;</button>
+              </div>
+
+              <div className="cart-items-list">
+                {cart.length === 0 ? (
+                  <p className="empty-cart-msg">Your shopping cart is empty.</p>
+                ) : (
+                  cart.map(item => (
+                    <div key={item.itemId} className="cart-item-row">
+                      <div className="cart-item-info">
+                        <h5>{item.name}</h5>
+                        <p>${item.price.toFixed(2)}</p>
+                      </div>
+                      
+                      <div className="cart-qty-controls">
+                        <button className="qty-change-btn" onClick={() => updateCartQty(item.itemId, -1)}>-</button>
+                        <span className="qty-value">{item.quantity}</span>
+                        <button className="qty-change-btn" onClick={() => updateCartQty(item.itemId, 1)}>+</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {cart.length > 0 && (
+                <div className="cart-checkout-box">
+                  {cartError && <div className="cart-error-banner">{cartError}</div>}
+                  
+                  <div className="cart-total-row">
+                    <span>Order Total:</span>
+                    <span className="cart-total-value">${cartTotal.toFixed(2)}</span>
+                  </div>
+
+                  <button className="checkout-btn" onClick={handleCheckout}>
+                    Checkout (${cartTotal.toFixed(2)})
+                  </button>
+                </div>
+              )}
+            </div>
+
+          </div>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    </script>
+  </body>
+</html>

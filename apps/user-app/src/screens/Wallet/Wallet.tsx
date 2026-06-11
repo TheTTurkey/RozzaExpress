@@ -31,7 +31,7 @@ const MEMBERSHIP_PLANS: MembershipPlan[] = [
       '+50 bonus loyalty points'
     ],
     recommended: true,
-    accentColor: '#ef4444' // Red brand brand accent
+    accentColor: '#ef4444'
   },
   {
     id: 'plan-2',
@@ -45,7 +45,7 @@ const MEMBERSHIP_PLANS: MembershipPlan[] = [
       'Exclusive uniform runner cap'
     ],
     recommended: false,
-    accentColor: '#10b981' // Green volunteer accent
+    accentColor: '#10b981'
   },
   {
     id: 'plan-3',
@@ -59,38 +59,16 @@ const MEMBERSHIP_PLANS: MembershipPlan[] = [
       '+250 bonus loyalty points'
     ],
     recommended: false,
-    accentColor: '#fbbf24' // Gold VIP accent
+    accentColor: '#fbbf24'
   }
 ];
 
 export default function Wallet({ currentUser, onTopUp, onNavigate }: WalletProps): React.ReactElement {
-  // Constants for points tiers
   const tierLimit = 500;
   const progressPercent = Math.min((currentUser.loyaltyPoints / tierLimit) * 100, 100);
 
   return (
-    <div className="wallet-screen">
-      {/* HEADER */}
-      <header className="wallet-header">
-        <div className="header-logo" onClick={() => onNavigate('Home')}>
-          <div className="logo-badge">R</div>
-          <div>
-            <span className="logo-title">Rozza Express</span>
-            <span className="logo-subtitle">Student Wallet & Loyalty</span>
-          </div>
-        </div>
-
-        <nav className="header-nav">
-          <button className="nav-btn" onClick={() => onNavigate('Home')}>Home</button>
-          <button className="nav-btn active">Wallet</button>
-          <button className="nav-btn" onClick={() => onNavigate('Tracking')}>Tracking</button>
-        </nav>
-
-        <div className="header-profile">
-          <div className="profile-initials">JT</div>
-        </div>
-      </header>
-
+    <div className="wallet-screen-content">
       <div className="wallet-layout">
         
         {/* LEFT COLUMN: WALLET BALANCE & TOP-UP */}
@@ -264,22 +242,6 @@ export default function Wallet({ currentUser, onTopUp, onNavigate }: WalletProps
         </div>
 
       </div>
-
-      {/* FOOTER NAVIGATION */}
-      <footer className="footer-nav-bar">
-        <button className="footer-nav-item" onClick={() => onNavigate('Home')}>
-          <span className="footer-nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-        <button className="footer-nav-item active" onClick={() => onNavigate('Wallet')}>
-          <span className="footer-nav-icon">💳</span>
-          <span>Wallet</span>
-        </button>
-        <button className="footer-nav-item" onClick={() => onNavigate('Tracking')}>
-          <span className="footer-nav-icon">📍</span>
-          <span>Tracking</span>
-        </button>
-      </footer>
     </div>
   );
 }

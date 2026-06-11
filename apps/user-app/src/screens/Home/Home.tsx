@@ -5,11 +5,9 @@ import './Home.css';
 interface HomeProps {
   currentUser: User;
   onAddToCart: (item: MenuItem) => void;
-  cartCount: number;
   onNavigate: (screen: 'Home' | 'Wallet' | 'Tracking') => void;
 }
 
-// Today's Deals mock data as shown in the screenshot
 interface DealItem {
   id: string;
   badgeText: string;
@@ -59,7 +57,6 @@ const TODAY_DEALS: DealItem[] = [
   }
 ];
 
-// Recommended/Frequently bought items based on user history
 const RECOMMENDED_ITEMS: MenuItem[] = [
   { itemId: 'rec-1', name: 'Steamed Pork Buns', price: 4.50, stockCount: 12, dietaryFilters: ['Soy', 'Gluten'] },
   { itemId: 'rec-2', name: 'Chocolate Milk', price: 3.50, stockCount: 8, dietaryFilters: ['Dairy'] },
@@ -67,7 +64,6 @@ const RECOMMENDED_ITEMS: MenuItem[] = [
   { itemId: 'rec-4', name: 'Hot Chips (Cup)', price: 3.00, stockCount: 20, dietaryFilters: ['Vegetarian'] }
 ];
 
-// Regular Menu items to display with stock checks
 const MENU_ITEMS: MenuItem[] = [
   { itemId: 'menu-1', name: 'Butter Chicken & Rice', price: 6.50, stockCount: 15, dietaryFilters: ['Gluten-Free'] },
   { itemId: 'menu-2', name: 'Mince & Cheese Pie', price: 4.50, stockCount: 4, dietaryFilters: ['Gluten', 'Dairy'] },
@@ -77,18 +73,16 @@ const MENU_ITEMS: MenuItem[] = [
   { itemId: 'menu-6', name: 'Chocolate Fudge Brownie', price: 3.00, stockCount: 0, dietaryFilters: ['Gluten', 'Dairy', 'Nut-Free'] }
 ];
 
-export default function Home({ currentUser, onAddToCart, cartCount, onNavigate }: HomeProps): React.ReactElement {
+export default function Home({ currentUser, onAddToCart, onNavigate }: HomeProps): React.ReactElement {
   const [orderMode, setOrderMode] = useState<'pre-order' | 'delivery'>('pre-order');
   const [selectedDietaryTags, setSelectedDietaryTags] = useState<string[]>([]);
 
-  // Toggles dietary tags in stateful filter bar
   const handleTagToggle = (tag: string) => {
     setSelectedDietaryTags(prev => 
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
-  // Filters menu items based on selected dietary filters
   const filteredMenuItems = useMemo(() => {
     if (selectedDietaryTags.length === 0) return MENU_ITEMS;
     return MENU_ITEMS.filter(item => 
@@ -98,7 +92,6 @@ export default function Home({ currentUser, onAddToCart, cartCount, onNavigate }
     );
   }, [selectedDietaryTags]);
 
-  // SVG Radial Circle metrics for 425 points out of 500
   const pointsMax = 500;
   const pointsPercent = Math.min((currentUser.loyaltyPoints / pointsMax) * 100, 100);
   const radius = 45;
@@ -106,40 +99,7 @@ export default function Home({ currentUser, onAddToCart, cartCount, onNavigate }
   const strokeDashoffset = circumference - (pointsPercent / 100) * circumference;
 
   return (
-    <div className="home-screen">
-      {/* HEADER */}
-      <header className="home-header">
-        <div className="header-logo" onClick={() => onNavigate('Home')}>
-          <div className="logo-badge">R</div>
-          <div>
-            <span className="logo-title">Rozza Express</span>
-            <span className="logo-subtitle">Rosmini College Tuck Shop</span>
-          </div>
-        </div>
-
-        <nav className="header-nav">
-          <button className="nav-btn active">Home</button>
-          <button className="nav-btn" onClick={() => onNavigate('Wallet')}>Menu</button>
-          <button className="nav-btn" onClick={() => onNavigate('Wallet')}>Rewards</button>
-        </nav>
-
-        <div className="header-actions">
-          <div className="points-pill" onClick={() => onNavigate('Wallet')}>
-            <span className="points-icon">⚡</span>
-            <span className="points-count">{currentUser.loyaltyPoints} pts</span>
-          </div>
-          <button className="cart-pill">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1"/>
-              <circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-            <span className="cart-text">Cart</span>
-            {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
-          </button>
-        </div>
-      </header>
-
+    <div className="home-screen-content">
       {/* HERO BANNER SECTION */}
       <div className="hero-container">
         {/* Left Side Info */}
@@ -287,7 +247,6 @@ export default function Home({ currentUser, onAddToCart, cartCount, onNavigate }
                 onClick={() => handleTagToggle(tag)}
               >
                 {tag}
-                {isActive && <span className="tag-remove-icon">&times;</span>}
               </button>
             );
           })}
@@ -335,22 +294,6 @@ export default function Home({ currentUser, onAddToCart, cartCount, onNavigate }
           })}
         </div>
       </section>
-
-      {/* FOOTER NAVIGATION */}
-      <footer className="footer-nav-bar">
-        <button className="footer-nav-item active" onClick={() => onNavigate('Home')}>
-          <span className="footer-nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-        <button className="footer-nav-item" onClick={() => onNavigate('Wallet')}>
-          <span className="footer-nav-icon">💳</span>
-          <span>Wallet</span>
-        </button>
-        <button className="footer-nav-item" onClick={() => onNavigate('Tracking')}>
-          <span className="footer-nav-icon">📍</span>
-          <span>Tracking</span>
-        </button>
-      </footer>
     </div>
   );
 }

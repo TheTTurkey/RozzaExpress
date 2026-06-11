@@ -1,33 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { User, Order } from '@rozza-express/shared';
 import './Tracking.css';
 
 interface TrackingProps {
   currentUser: User;
+  activeOrder: Order | null;
+  onAdvanceOrder: () => void;
   onNavigate: (screen: 'Home' | 'Wallet' | 'Tracking') => void;
 }
 
-// Mock active orders for tracking demonstration
-const mockActiveOrders: Order[] = [
-  {
-    orderId: 'ORD-5502',
-    studentId: 'STU-22235',
-    items: [
-      { itemId: 'menu-4', name: 'Rosmini College Sausage Roll', price: 3.20, quantity: 2 },
-      { itemId: 'menu-2', name: 'Mince & Cheese Pie', price: 4.50, quantity: 1 }
-    ],
-    totalPrice: 10.90,
-    status: 'In-Transit',
-    isPreOrder: false,
-    pickupTime: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-    deliveryEta: new Date(Date.now() + 8 * 60 * 1000).toISOString()
-  }
-];
-
-export default function Tracking({ currentUser, onNavigate }: TrackingProps): React.ReactElement {
-  const [activeOrders, setActiveOrders] = useState<Order[]>(mockActiveOrders);
-
-  // Helper to determine the step index of the order status
+export default function Tracking({ currentUser, activeOrder, onAdvanceOrder, onNavigate }: TrackingProps): React.ReactElement {
+  
   const getStatusStepIndex = (status: Order['status']): number => {
     switch (status) {
       case 'Pending': return 0;
@@ -37,7 +20,6 @@ export default function Tracking({ currentUser, onNavigate }: TrackingProps): Re
     }
   };
 
-  // Calculates remaining minutes based on the ISO deliveryEta
   const getRemainingMinutes = (etaString: string | null): number => {
     if (!etaString) return 0;
     const diffMs = new Date(etaString).getTime() - Date.now();
@@ -45,52 +27,8 @@ export default function Tracking({ currentUser, onNavigate }: TrackingProps): Re
     return diffMins > 0 ? diffMins : 0;
   };
 
-  // Simulated button to toggle status for hackathon integration testing (Liam T)
-  const toggleOrderStatus = (orderId: string) => {
-    setActiveOrders(prev => prev.map(order => {
-      if (order.orderId !== orderId) return order;
-      let nextStatus: Order['status'] = order.status;
-      let nextEta: string | null = order.deliveryEta;
-      
-      if (order.status === 'Pending') {
-        nextStatus = 'Preparing';
-      } else if (order.status === 'Preparing') {
-        nextStatus = 'In-Transit';
-        nextEta = new Date(Date.now() + 12 * 60 * 1000).toISOString();
-      } else if (order.status === 'In-Transit') {
-        nextStatus = 'Completed';
-        nextEta = null;
-      } else {
-        nextStatus = 'Pending';
-      }
-      
-      return { ...order, status: nextStatus, deliveryEta: nextEta };
-    }));
-  };
-
   return (
-    <div className="tracking-screen">
-      {/* HEADER */}
-      <header className="tracking-header">
-        <div className="header-logo" onClick={() => onNavigate('Home')}>
-          <div className="logo-badge">R</div>
-          <div>
-            <span className="logo-title">Rozza Express</span>
-            <span className="logo-subtitle">Live Tracking & Service</span>
-          </div>
-        </div>
-
-        <nav className="header-nav">
-          <button className="nav-btn" onClick={() => onNavigate('Home')}>Home</button>
-          <button className="nav-btn" onClick={() => onNavigate('Wallet')}>Wallet</button>
-          <button className="nav-btn active">Tracking</button>
-        </nav>
-
-        <div className="header-profile">
-          <div className="profile-initials">JT</div>
-        </div>
-      </header>
-
+    <div className="tracking-screen-content">
       <div className="tracking-layout">
         
         {/* LEFT COLUMN: ACTIVE TRACKING */}
@@ -101,7 +39,7 @@ export default function Tracking({ currentUser, onNavigate }: TrackingProps): Re
               Track the exact progress of your lunch. Status updates in real-time as Austin's backend processes your request.
             </p>
 
-            {activeOrders.length === 0 ? (
+            {!activeOrder ? (
               <div className="empty-tracking-state">
                 <span>📦</span>
                 <p>No active orders currently under delivery.</p>
@@ -110,106 +48,100 @@ export default function Tracking({ currentUser, onNavigate }: TrackingProps): Re
                 </button>
               </div>
             ) : (
-              activeOrders.map((order) => {
-                const currentStep = getStatusStepIndex(order.status);
-                const remainingMinutes = getRemainingMinutes(order.deliveryEta);
-
-                return (
-                  <div key={order.orderId} className="active-order-tracking-card">
-                    
-                    {/* Header Info */}
-                    <div className="tracking-card-header">
-                      <div>
-                        <h4>Order ID: <span className="highlight-text">{order.orderId}</span></h4>
-                        <p className="items-summary">
-                          {order.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
-                        </p>
-                      </div>
-                      <div className="eta-badge-container">
-                        {order.status === 'In-Transit' && order.deliveryEta ? (
-                          <div className="eta-badge active">
-                            <span className="eta-timer-icon">🛵</span>
-                            <span className="eta-number">{remainingMinutes} mins</span>
-                          </div>
-                        ) : (
-                          <div className="eta-badge">
-                            <span>{order.status}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Step Visualizer */}
-                    <div className="tracking-steps-container">
-                      <div className="progress-line">
-                        <div 
-                          className="progress-line-fill" 
-                          style={{ width: `${(currentStep / 3) * 100}%` }}
-                        />
-                      </div>
-
-                      {[
-                        { label: 'Pending', icon: '📝' },
-                        { label: 'Preparing', icon: '🍳' },
-                        { label: 'In-Transit', icon: '🛵' },
-                        { label: 'Completed', icon: '✅' }
-                      ].map((step, index) => {
-                        const isDone = index <= currentStep;
-                        const isActive = index === currentStep;
-
-                        return (
-                          <div 
-                            key={step.label} 
-                            className={`step-node ${isDone ? 'done' : ''} ${isActive ? 'active-pulse' : ''}`}
-                          >
-                            <div className="step-icon-wrap">
-                              {step.icon}
-                            </div>
-                            <span className="step-label">{step.label}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Additional Tracking Details */}
-                    <div className="tracking-info-details">
-                      {order.status === 'Pending' && (
-                        <p className="detail-status-text">
-                          👍 Your order has been submitted. Austin's tuckshop backend is waiting to queue it.
-                        </p>
-                      )}
-                      {order.status === 'Preparing' && (
-                        <p className="detail-status-text">
-                          🔥 The tuckshop staff is preparing your hot meals! Almost ready for dispatch.
-                        </p>
-                      )}
-                      {order.status === 'In-Transit' && (
-                        <p className="detail-status-text">
-                          🚀 A certified student runner has collected your order and is heading towards your homeroom classroom.
-                        </p>
-                      )}
-                      {order.status === 'Completed' && (
-                        <p className="detail-status-text" style={{ color: '#059669' }}>
-                          🎉 Order successfully delivered! Enjoy your lunch. Thank you for using RozzaExpress!
-                        </p>
-                      )}
-                    </div>
-
-                    {/* HACKATHON HELP: Action to simulate status triggers */}
-                    <div className="hackathon-simulation-panel">
-                      <span className="simulation-tag">TEST TOOL</span>
-                      <p>Simulation controls for Liam T to test status changes:</p>
-                      <button 
-                        className="simulate-next-btn"
-                        onClick={() => toggleOrderStatus(order.orderId)}
-                      >
-                        Advance Order Status (Backend Mock)
-                      </button>
-                    </div>
-
+              <div className="active-order-tracking-card">
+                
+                {/* Header Info */}
+                <div className="tracking-card-header">
+                  <div>
+                    <h4>Order ID: <span className="highlight-text">{activeOrder.orderId}</span></h4>
+                    <p className="items-summary">
+                      {activeOrder.items.map(i => `${i.name} (x${i.quantity})`).join(', ')}
+                    </p>
                   </div>
-                );
-              })
+                  <div className="eta-badge-container">
+                    {activeOrder.status === 'In-Transit' && activeOrder.deliveryEta ? (
+                      <div className="eta-badge active">
+                        <span className="eta-timer-icon">🛵</span>
+                        <span className="eta-number">{getRemainingMinutes(activeOrder.deliveryEta)} mins</span>
+                      </div>
+                    ) : (
+                      <div className="eta-badge">
+                        <span>{activeOrder.status}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Step Visualizer */}
+                <div className="tracking-steps-container">
+                  <div className="progress-line">
+                    <div 
+                      className="progress-line-fill" 
+                      style={{ width: `${(getStatusStepIndex(activeOrder.status) / 3) * 100}%` }}
+                    />
+                  </div>
+
+                  {[
+                    { label: 'Pending', icon: '📝' },
+                    { label: 'Preparing', icon: '🍳' },
+                    { label: 'In-Transit', icon: '🛵' },
+                    { label: 'Completed', icon: '✅' }
+                  ].map((step, index) => {
+                    const currentStep = getStatusStepIndex(activeOrder.status);
+                    const isDone = index <= currentStep;
+                    const isActive = index === currentStep;
+
+                    return (
+                      <div 
+                        key={step.label} 
+                        className={`step-node ${isDone ? 'done' : ''} ${isActive ? 'active-pulse' : ''}`}
+                      >
+                        <div className="step-icon-wrap">
+                          {step.icon}
+                        </div>
+                        <span className="step-label">{step.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Additional Tracking Details */}
+                <div className="tracking-info-details">
+                  {activeOrder.status === 'Pending' && (
+                    <p className="detail-status-text">
+                      👍 Your order has been submitted. Austin's tuckshop backend is waiting to queue it.
+                    </p>
+                  )}
+                  {activeOrder.status === 'Preparing' && (
+                    <p className="detail-status-text">
+                      🔥 The tuckshop staff is preparing your hot meals! Almost ready for dispatch.
+                    </p>
+                  )}
+                  {activeOrder.status === 'In-Transit' && (
+                    <p className="detail-status-text">
+                      🚀 A certified student runner has collected your order and is heading towards your homeroom classroom.
+                    </p>
+                  )}
+                  {activeOrder.status === 'Completed' && (
+                    <p className="detail-status-text" style={{ color: '#059669' }}>
+                      🎉 Order successfully delivered! Enjoy your lunch. Thank you for using RozzaExpress!
+                    </p>
+                  )}
+                </div>
+
+                {/* HACKATHON HELP: Action to simulate status triggers */}
+                <div className="hackathon-simulation-panel">
+                  <span className="simulation-tag">TEST TOOL</span>
+                  <p>Simulation controls for Liam T to test status changes:</p>
+                  <button 
+                    className="simulate-next-btn"
+                    onClick={onAdvanceOrder}
+                  >
+                    Advance Order Status (Backend Mock)
+                  </button>
+                </div>
+
+              </div>
             )}
           </section>
         </div>
@@ -285,22 +217,6 @@ export default function Tracking({ currentUser, onNavigate }: TrackingProps): Re
         </div>
 
       </div>
-
-      {/* FOOTER NAVIGATION */}
-      <footer className="footer-nav-bar">
-        <button className="footer-nav-item" onClick={() => onNavigate('Home')}>
-          <span className="footer-nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-        <button className="footer-nav-item" onClick={() => onNavigate('Wallet')}>
-          <span className="footer-nav-icon">💳</span>
-          <span>Wallet</span>
-        </button>
-        <button className="footer-nav-item active" onClick={() => onNavigate('Tracking')}>
-          <span className="footer-nav-icon">📍</span>
-          <span>Tracking</span>
-        </button>
-      </footer>
     </div>
   );
 }

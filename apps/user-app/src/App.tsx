@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, MenuItem } from '@rozza-express/shared';
+import { User, MenuItem, Order, OrderItem } from '@rozza-express/shared';
 import Login from './screens/Auth/Login';
 import Home from './screens/Home/Home';
 import Wallet from './screens/Wallet/Wallet';
@@ -10,19 +10,25 @@ type ScreenName = 'Login' | 'Home' | 'Wallet' | 'Tracking';
 export default function App(): React.ReactElement {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('Login');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [cart, setCart] = useState<{ [itemId: string]: number }>({});
+  
+  // Shopping Cart state
+  const [cart, setCart] = useState<OrderItem[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartError, setCartError] = useState('');
+
+  // Active tracked order
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
 
   const handleLoginSuccess = (validatedUser: { id: string; name: string; email: string }) => {
-    // Preload student profile with visual details matching the mock screenshot:
-    // e.g. Josh Tuilagi, 425 loyalty points, $25.50 balance, 8.0 voluntary hours
+    // Preload student profile with visual details matching the mock screenshot
     const fullUserProfile: User = {
       id: validatedUser.id,
       name: validatedUser.name,
       email: validatedUser.email,
-      walletBalance: 25.50, // Preloaded balance for testing
-      loyaltyPoints: 425,   // Preloaded points matching design screenshot
-      isDeliveryRunner: true, // Preloaded to demonstrate the helper status widget
-      voluntaryHours: 8.0    // Preloaded hours matching design screenshot
+      walletBalance: 25.50,
+      loyaltyPoints: 425,
+      isDeliveryRunner: true,
+      voluntaryHours: 8.0
     };
     setCurrentUser(fullUserProfile);
     setCurrentScreen('Home');
@@ -41,59 +47,222 @@ export default function App(): React.ReactElement {
   };
 
   const handleAddToCart = (item: MenuItem) => {
-    setCart(prev => ({
-      ...prev,
-      [item.itemId]: (prev[item.itemId] || 0) + 1
-    }));
-    
-    // Dynamically calculate loyalty points addition: $1 spend = 1 point
-    setCurrentUser(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        loyaltyPoints: prev.loyaltyPoints + Math.round(item.price)
-      };
+    setCart(prev => {
+      const exists = prev.find(i => i.itemId === item.itemId);
+      if (exists) {
+        return prev.map(i => i.itemId === item.itemId ? { ...i, quantity: i.quantity + 1 } : i);
+      }
+      return [...prev, { itemId: item.itemId, name: item.name, price: item.price, quantity: 1 }];
     });
     console.log(`[Cart] Added "${item.name}" to cart.`);
   };
 
-  const cartCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+  const updateCartQty = (itemId: string, change: number) => {
+    setCart(prev => prev.map(item => {
+      if (item.itemId !== itemId) return item;
+      const nextQty = item.quantity + change;
+      return nextQty > 0 ? { ...item, quantity: nextQty } : null;
+    }).filter((item): item is OrderItem => item !== null));
+  };
 
-  // Screen Routing switch
-  const renderScreen = () => {
-    if (!currentUser || currentScreen === 'Login') {
-      return <Login onLoginSuccess={handleLoginSuccess} />;
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleCheckout = () => {
+    setCartError('');
+    if (!currentUser) return;
+
+    if (currentUser.walletBalance < cartTotal) {
+      setCartError('Insufficient wallet balance. Please top up funds.');
+      return;
     }
 
-    switch (currentScreen) {
-      case 'Home':
-        return (
+    // Deduct from wallet, add loyalty points (1 point per dollar spent)
+    const pointsEarned = Math.round(cartTotal);
+    setCurrentUser(prev => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        walletBalance: prev.walletBalance - cartTotal,
+        loyaltyPoints: prev.loyaltyPoints + pointsEarned
+      };
+    });
+
+    // Create and track order
+    const newOrder: Order = {
+      orderId: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
+      studentId: currentUser.id,
+      items: [...cart],
+      totalPrice: cartTotal,
+      status: 'Pending',
+      isPreOrder: false,
+      pickupTime: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      deliveryEta: null
+    };
+
+    setActiveOrder(newOrder);
+    setCart([]); // Clear cart
+    setCartOpen(false); // Close cart drawer
+    setCurrentScreen('Tracking'); // Auto-route to live tracking
+  };
+
+  // Simulator control for delivery runner updates ( Liam T )
+  const handleAdvanceOrder = () => {
+    if (!activeOrder) return;
+    setActiveOrder(prev => {
+      if (!prev) return null;
+      let nextStatus: Order['status'] = prev.status;
+      let nextEta: string | null = prev.deliveryEta;
+
+      if (prev.status === 'Pending') {
+        nextStatus = 'Preparing';
+      } else if (prev.status === 'Preparing') {
+        nextStatus = 'In-Transit';
+        nextEta = new Date(Date.now() + 8 * 60 * 1000).toISOString();
+      } else if (prev.status === 'In-Transit') {
+        nextStatus = 'Completed';
+        nextEta = null;
+      } else {
+        nextStatus = 'Pending';
+      }
+
+      return {
+        ...prev,
+        status: nextStatus,
+        deliveryEta: nextEta
+      };
+    });
+  };
+
+  // Authentication gate
+  if (!currentUser || currentScreen === 'Login') {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  return (
+    <div className="app-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '75px' }}>
+      
+      {/* PERSISTENT HEADER (Navbar identical on all screens) */}
+      <header className="home-header">
+        <div className="header-logo" onClick={() => setCurrentScreen('Home')}>
+          <div className="logo-badge">R</div>
+          <div>
+            <span className="logo-title">Rozza Express</span>
+            <span className="logo-subtitle">Rosmini College Tuck Shop</span>
+          </div>
+        </div>
+
+        <nav className="header-nav">
+          <button className={`nav-btn ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>Home</button>
+          <button className={`nav-btn ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>Wallet</button>
+          <button className={`nav-btn ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>Tracking</button>
+        </nav>
+
+        <div className="header-actions">
+          <div className="points-pill" onClick={() => setCurrentScreen('Wallet')}>
+            <span className="points-icon">⚡</span>
+            <span className="points-count">{currentUser.loyaltyPoints} pts</span>
+          </div>
+          <button className="cart-pill" onClick={() => setCartOpen(true)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span className="cart-text">Cart</span>
+            {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
+          </button>
+        </div>
+      </header>
+
+      {/* SCREEN ROUTING */}
+      <main style={{ flex: 1 }}>
+        {currentScreen === 'Home' && (
           <Home
             currentUser={currentUser}
             onAddToCart={handleAddToCart}
-            cartCount={cartCount}
             onNavigate={setCurrentScreen}
           />
-        );
-      case 'Wallet':
-        return (
+        )}
+        {currentScreen === 'Wallet' && (
           <Wallet
             currentUser={currentUser}
             onTopUp={handleTopUp}
             onNavigate={setCurrentScreen}
           />
-        );
-      case 'Tracking':
-        return (
+        )}
+        {currentScreen === 'Tracking' && (
           <Tracking
             currentUser={currentUser}
+            activeOrder={activeOrder}
+            onAdvanceOrder={handleAdvanceOrder}
             onNavigate={setCurrentScreen}
           />
-        );
-      default:
-        return <Login onLoginSuccess={handleLoginSuccess} />;
-    }
-  };
+        )}
+      </main>
 
-  return <React.Fragment>{renderScreen()}</React.Fragment>;
+      {/* PERSISTENT BOTTOM NAVIGATION BAR */}
+      <footer className="footer-nav-bar">
+        <button className={`footer-nav-item ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>
+          <span className="footer-nav-icon">🏠</span>
+          <span>Home</span>
+        </button>
+        <button className={`footer-nav-item ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>
+          <span className="footer-nav-icon">💳</span>
+          <span>Wallet</span>
+        </button>
+        <button className={`footer-nav-item ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>
+          <span className="footer-nav-icon">📍</span>
+          <span>Tracking</span>
+        </button>
+      </footer>
+
+      {/* CART DRAWER SLIDE-OUT MODAL */}
+      <div className={`cart-overlay ${cartOpen ? 'open' : ''}`} onClick={() => { setCartOpen(false); setCartError(''); }} />
+      
+      <div className={`cart-drawer ${cartOpen ? 'open' : ''}`}>
+        <div className="cart-drawer-header">
+          <h3>Shopping Cart</h3>
+          <button className="close-cart-btn" onClick={() => { setCartOpen(false); setCartError(''); }}>&times;</button>
+        </div>
+
+        <div className="cart-items-list">
+          {cart.length === 0 ? (
+            <p className="empty-cart-msg">Your shopping cart is empty.</p>
+          ) : (
+            cart.map(item => (
+              <div key={item.itemId} className="cart-item-row">
+                <div className="cart-item-info">
+                  <h5>{item.name}</h5>
+                  <p>${item.price.toFixed(2)}</p>
+                </div>
+                
+                <div className="cart-qty-controls">
+                  <button className="qty-change-btn" onClick={() => updateCartQty(item.itemId, -1)}>-</button>
+                  <span className="qty-value">{item.quantity}</span>
+                  <button className="qty-change-btn" onClick={() => updateCartQty(item.itemId, 1)}>+</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {cart.length > 0 && (
+          <div className="cart-checkout-box">
+            {cartError && <div className="cart-error-banner">{cartError}</div>}
+            
+            <div className="cart-total-row">
+              <span>Order Total:</span>
+              <span className="cart-total-value">${cartTotal.toFixed(2)}</span>
+            </div>
+
+            <button className="checkout-btn" onClick={handleCheckout}>
+              Checkout (${cartTotal.toFixed(2)})
+            </button>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
 }
