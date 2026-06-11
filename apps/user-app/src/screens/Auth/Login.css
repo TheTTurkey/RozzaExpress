@@ -1,0 +1,185 @@
+/* ============================================
+   Login Screen Styling - RozzaExpress
+   ============================================ */
+
+.login-page {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--clr-bg);
+  color: var(--clr-text);
+  padding: 2rem;
+  overflow: hidden;
+}
+
+/* Background Blurs */
+.login-bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+  width: 400px;
+  height: 400px;
+}
+
+.login-bg-blob--1 {
+  background-color: var(--clr-student);
+  top: -10%;
+  left: -10%;
+}
+
+.login-bg-blob--2 {
+  background-color: #ef4444; /* Red theme accent blob */
+  bottom: -10%;
+  right: -10%;
+}
+
+/* Card layout */
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 440px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-logo-container {
+  width: 64px;
+  height: 64px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.25rem;
+}
+
+.login-title-highlight {
+  background: linear-gradient(135deg, #ef4444, var(--clr-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-subtitle {
+  font-size: 0.95rem;
+  color: var(--clr-text-muted);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Error Alert */
+.login-error-alert {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Form inputs */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--clr-text);
+  letter-spacing: 0.02em;
+}
+
+.input-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #ef4444;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+  line-height: 1.3;
+}
+
+/* Button */
+.login-submit-btn {
+  width: 100%;
+  background: #ef4444;
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  margin-top: 0.5rem;
+}
+
+.login-submit-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.login-submit-btn:active {
+  transform: translateY(-1px);
+}

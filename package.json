@@ -1,20 +1,19 @@
 {
-  "name": "rozza-express",
+  "name": "rozza-express-monorepo",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.2"
+    "build:shared": "npm run build -w @rozza-express/shared",
+    "build:all": "npm run build:shared && npm run build --workspaces --if-present",
+    "dev:user": "npm run dev -w @rozza-express/user-app",
+    "dev:staff": "npm run dev -w @rozza-express/staff-app",
+    "dev:server": "npm run dev -w @rozza-express/server"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.5.2",
-    "vite": "^6.3.5"
+    "typescript": "^5.5.0"
   }
 }

@@ -1,0 +1,166 @@
+{
+  "info": {
+    "title": "RozzaExpress API Contract",
+    "version": "1.0.0",
+    "description": "Standardized JSON endpoints connecting Joseph's student client (user-app) and Austin's backend server. Built using shared Zod models.",
+    "host": "http://localhost:4000"
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "description": "Validates student credentials via Google sign-in email validation, returning user profile and session token.",
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "22235@rosmini.school.nz",
+          "name": "Josh Tuilagi"
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Successfully authenticated student session",
+          "body": {
+            "token": "jwt_session_token_example",
+            "user": {
+              "id": "STU-22235",
+              "name": "Josh Tuilagi",
+              "email": "22235@rosmini.school.nz",
+              "walletBalance": 25.50,
+              "loyaltyPoints": 425,
+              "isDeliveryRunner": true,
+              "voluntaryHours": 8.0
+            }
+          }
+        },
+        "400": {
+          "description": "Validation failed (e.g. invalid Rosmini email structure)",
+          "body": {
+            "error": "Validation failed",
+            "details": [
+              {
+                "path": "email",
+                "message": "Email must be a Rosmini College student email starting with a number (e.g., 24015@rosmini.school.nz)"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/menu",
+      "description": "Fetches active tuckshop menu items including prices, current stock counts, and dietary filter tags.",
+      "request": {
+        "headers": {
+          "Authorization": "Bearer jwt_session_token_example"
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "List of menu items available",
+          "body": [
+            {
+              "itemId": "menu-1",
+              "name": "Butter Chicken & Rice",
+              "price": 6.50,
+              "stockCount": 15,
+              "dietaryFilters": ["Gluten-Free"]
+            },
+            {
+              "itemId": "menu-2",
+              "name": "Mince & Cheese Pie",
+              "price": 4.50,
+              "stockCount": 0,
+              "dietaryFilters": ["Gluten", "Dairy"]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/orders/create",
+      "description": "Creates a new tuckshop order. Supports pre-orders and class delivery assignments.",
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer jwt_session_token_example"
+        },
+        "body": {
+          "studentId": "STU-22235",
+          "items": [
+            {
+              "itemId": "menu-1",
+              "name": "Butter Chicken & Rice",
+              "price": 6.50,
+              "quantity": 1
+            }
+          ],
+          "totalPrice": 6.50,
+          "isPreOrder": true,
+          "pickupTime": "2026-06-11T13:10:00.000Z",
+          "deliveryEta": "2026-06-11T13:15:00.000Z"
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Order submitted and queued successfully",
+          "body": {
+            "message": "Order created successfully",
+            "order": {
+              "orderId": "ORD-77983",
+              "studentId": "STU-22235",
+              "items": [
+                {
+                  "itemId": "menu-1",
+                  "name": "Butter Chicken & Rice",
+                  "price": 6.50,
+                  "quantity": 1
+                }
+              ],
+              "totalPrice": 6.50,
+              "status": "Pending",
+              "isPreOrder": true,
+              "pickupTime": "2026-06-11T13:10:00.000Z",
+              "deliveryEta": "2026-06-11T13:15:00.000Z"
+            }
+          }
+        },
+        "400": {
+          "description": "Cart validation failed or insufficient balance",
+          "body": {
+            "error": "Insufficient wallet balance to cover the order total."
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/wallet/topup",
+      "description": "Updates the student's simulated wallet balance using pre-authorized tuition credits.",
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer jwt_session_token_example"
+        },
+        "body": {
+          "studentId": "STU-22235",
+          "amount": 20.00
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Wallet topped up successfully",
+          "body": {
+            "message": "Top-up completed",
+            "studentId": "STU-22235",
+            "newBalance": 45.50
+          }
+        }
+      }
+    }
+  ]
+}
