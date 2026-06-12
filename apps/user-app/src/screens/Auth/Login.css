@@ -14,28 +14,9 @@
   overflow: hidden;
 }
 
-/* Background Blurs */
+/* Background Blurs - Hidden for classic portal */
 .login-bg-blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 0;
-  width: 400px;
-  height: 400px;
-}
-
-.login-bg-blob--1 {
-  background-color: var(--clr-student);
-  top: -10%;
-  left: -10%;
-}
-
-.login-bg-blob--2 {
-  background-color: #ef4444; /* Red theme accent blob */
-  bottom: -10%;
-  right: -10%;
+  display: none;
 }
 
 /* Card layout */
@@ -46,11 +27,9 @@
   max-width: 440px;
   background: var(--clr-surface);
   border: 1px solid var(--clr-border);
-  border-radius: var(--radius-lg);
-  padding: 3rem 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-md);
+  padding: 3rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -59,9 +38,9 @@
 .login-logo-container {
   width: 64px;
   height: 64px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--radius-md);
+  background: rgba(15, 88, 157, 0.1);
+  border: 1px solid rgba(15, 88, 157, 0.25);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,17 +49,15 @@
 }
 
 .login-title {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin-bottom: 0.25rem;
+  color: var(--clr-student);
 }
 
 .login-title-highlight {
-  background: linear-gradient(135deg, #ef4444, var(--clr-accent-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--clr-accent);
 }
 
 .login-subtitle {
@@ -88,14 +65,15 @@
   color: var(--clr-text-muted);
   margin-bottom: 2rem;
   text-align: center;
+  font-weight: 500;
 }
 
 /* Error Alert */
 .login-error-alert {
   width: 100%;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.25);
-  color: #f87171;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
   padding: 0.85rem 1rem;
   border-radius: var(--radius-sm);
   display: flex;
@@ -110,6 +88,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  color: #ef4444;
 }
 
 /* Form inputs */
@@ -128,40 +107,40 @@
 
 .input-group label {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--clr-text);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .input-group input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--clr-border);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   color: var(--clr-text);
   padding: 0.85rem 1rem;
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .input-group input:focus {
   outline: none;
-  border-color: #ef4444;
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--clr-student);
+  box-shadow: 0 0 0 3px rgba(15, 88, 157, 0.15);
 }
 
 .input-hint {
   font-size: 0.75rem;
   color: var(--clr-text-muted);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 /* Button */
 .login-submit-btn {
   width: 100%;
-  background: #ef4444;
+  background: var(--clr-student);
   color: #fff;
-  padding: 0.85rem 1.5rem;
+  padding: 0.9rem 1.5rem;
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   font-weight: 700;
@@ -169,17 +148,17 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
-  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: 0 2px 4px rgba(15, 88, 157, 0.15);
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
   margin-top: 0.5rem;
 }
 
 .login-submit-btn:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+  background: var(--clr-student-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 88, 157, 0.25);
 }
 
 .login-submit-btn:active {
-  transform: translateY(-1px);
+  transform: translateY(0);
 }
