@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Staff Management Backend</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+  }
+  section {
+    margin-bottom: 20px;
+  }
+  input, button {
+    margin: 5px;
+  }
+  #log {
+    background-color: #f0f0f0;
+    padding: 10px;
+    height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+<h1>Staff Management System (Backend Mode)</h1>
+
+<div id="login-section">
+  <h2>Login</h2>
+  <input type="text" id="login-username" placeholder="Username" />
+  <input type="password" id="login-password" placeholder="Password" />
+  <button id="login-btn">Login</button>
+</div>
+
+<div id="system" style="display:none;">
+  <h2>Welcome, Staff!</h2>
+  <button id="logout-btn">Logout</button>
+
+  <section>
+    <h3>Manage Menu Items</h3>
+    <input type="text" id="menu-item-name" placeholder="Item Name" />
+    <input type="number" id="menu-item-price" placeholder="Price" step="0.01" />
+    <button id="add-menu-item">Add Item</button>
+    <ul id="menu-list"></ul>
+  </section>
+
+  <section>
+    <h3>Orders</h3>
+    <button id="simulate-order">Simulate New Order</button>
+    <ul id="orders-list"></ul>
+  </section>
+
+  <section>
+    <h3>Stock Management</h3>
+    <button id="restock-stock">Restock Stock</button>
+    <ul id="stock-list"></ul>
+  </section>
+
+  <section>
+    <h3>Profit & Analytics</h3>
+    <div>Total Profit: $<span id="profit">0.00</span></div>
+  </section>
+
+  <section>
+    <h3>Notes & Announcements</h3>
+    <textarea id="notes-area" rows="4" cols="50" readonly></textarea><br/>
+    <input type="text" id="new-note" placeholder="Add Note" />
+    <button id="add-note">Add Note</button>
+  </section>
+
+  <section>
+    <h3>Logs</h3>
+    <div id="log"></div>
+  </section>
+</div>
+
+<script>
+  // Authentication logic
+  const loginBtn = document.getElementById('login-btn');
+  const loginSection = document.getElementById('login-section');
+  const systemDiv = document.getElementById('system');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  loginBtn.onclick = () => {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    if (password === 'staff202') {
+      loginSection.style.display = 'none';
+      systemDiv.style.display = 'block';
+      log(`User ${username} logged in.`);
+    } else {
+      alert('Incorrect password.');
+    }
+  };
+
+  logoutBtn.onclick = () => {
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    loginSection.style.display = 'block';
+    systemDiv.style.display = 'none';
+    log('User logged out.');
+  };
+
+  // Data storage
+  let menuItems = [];
+  let orders = [];
+  let stock = {};
+  let totalProfit = 0;
+  let notes = [];
+
+  // Utility log function
+  function log(message) {
+    const logDiv = document.getElementById('log');
+    logDiv.innerHTML += message + '<br/>';
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  // Manage menu items
+ document.getElementById('add-menu-item').onclick = () => {
+    const name = document.getElementById('menu-item-name').value.trim();
+    const price = parseFloat(document.getElementById('menu-item-price').value);
+    if (name && !isNaN(price)) {
+      menuItems.push({ name, price });
+      updateMenuList();
+      log(`Added menu item: ${name} at $${price.toFixed(2)}`);
+      document.getElementById('menu-item-name').value = '';
+      document.getElementById('menu-item-price').value = '';
+    } else {
+      alert('Enter valid item name and price.');
+    }
+  };
+
+  function updateMenuList() {
+    const list = document.getElementById('menu-list');
+    list.innerHTML = '';
+    menuItems.forEach((item, index) => {
+      list.innerHTML += `<li>${item.name} - $${item.price.toFixed(2)}</li>`;
+    });
+  }
+
+  // Simulate orders
+ document.getElementById('simulate-order').onclick = () => {
+    if (menuItems.length === 0) {
+      alert('No menu items to order.');
+      return;
+    }
+    const item = menuItems[Math.floor(Math.random() * menuItems.length)];
+    const orderId = orders.length + 1;
+    const order = {
+      id: orderId,
+      item: item.name,
+      price: item.price,
+      timestamp: new Date()
+    };
+    orders.push(order);
+    updateOrders();
+    totalProfit += item.price;
+    document.getElementById('profit').innerText = totalProfit.toFixed(2);
+    log(`Order #${order.id}: ${item.name} at $${item.price.toFixed(2)}`);
+  };
+
+  function updateOrders() {
+    const list = document.getElementById('orders-list');
+    list.innerHTML = '';
+    orders.forEach(order => {
+      list.innerHTML += `<li>Order #${order.id}: ${order.item} - $${order.price.toFixed(2)} (${order.timestamp.toLocaleString()})</li>`;
+    });
+  }
+
+  // Restock stock
+ document.getElementById('restock-stock').onclick = () => {
+    if (menuItems.length === 0) {
+      alert('Add menu items first.');
+      return;
+    }
+    menuItems.forEach(item => {
+      stock[item.name] = (stock[item.name] || 0) + 10; // Add 10 units
+    });
+    updateStock();
+    log('Stock restocked with 10 units for all items.');
+  };
+
+  function updateStock() {
+    const list = document.getElementById('stock-list');
+    list.innerHTML = '';
+    for (const item in stock) {
+      list.innerHTML += `<li>${item}: ${stock[item]} units</li>`;
+    }
+  }
+
+  // Add notes
+ document.getElementById('add-note').onclick = () => {
+    const noteText = document.getElementById('new-note').value.trim();
+    if (noteText) {
+      notes.push({ text: noteText, timestamp: new Date() });
+      updateNotes();
+      document.getElementById('new-note').value = '';
+      log(`Note added: ${noteText}`);
+    }
+  };
+
+  function updateNotes() {
+    const textarea = document.getElementById('notes-area');
+    textarea.value = '';
+    notes.forEach(note => {
+      textarea.value += `[${note.timestamp.toLocaleString()}] ${note.text}\n`;
+    });
+  }
+
+  // Initialize display
+  updateMenuList();
+  updateOrders();
+  updateStock();
+  updateNotes();
+
+</script>
+</body>
+</html>
