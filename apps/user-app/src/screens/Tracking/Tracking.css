@@ -77,7 +77,7 @@
 }
 
 .back-home-btn {
-  background: #ef4444;
+  background: var(--clr-student);
   color: #fff;
   font-weight: 700;
   padding: 0.75rem 1.5rem;
@@ -87,7 +87,7 @@
 }
 
 .back-home-btn:hover {
-  background: #dc2626;
+  background: var(--clr-student-light);
 }
 
 /* ---- Active Tracking Card ---- */
@@ -118,7 +118,7 @@
 }
 
 .highlight-text {
-  color: #ef4444;
+  color: var(--clr-accent);
 }
 
 .items-summary {
@@ -144,9 +144,9 @@
 }
 
 .eta-badge.active {
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  color: #d97706;
+  background: rgba(15, 88, 157, 0.1);
+  border: 1px solid rgba(15, 88, 157, 0.2);
+  color: var(--clr-student);
 }
 
 .eta-timer-icon {
@@ -177,7 +177,7 @@
 
 .progress-line-fill {
   height: 100%;
-  background: #ef4444;
+  background: var(--clr-accent);
   transition: width 0.35s ease;
 }
 
@@ -214,29 +214,29 @@
 
 /* Steps Node States */
 .step-node.done .step-icon-wrap {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.05);
+  border-color: var(--clr-student);
+  background: rgba(15, 88, 157, 0.05);
 }
 
 .step-node.done .step-label {
-  color: #0f172a;
+  color: var(--clr-text);
 }
 
 .step-node.active-pulse .step-icon-wrap {
-  border-color: #ef4444;
-  background: #ef4444;
+  border-color: var(--clr-accent);
+  background: var(--clr-accent);
   color: #fff;
   animation: pulseScale 2s infinite;
 }
 
 .step-node.active-pulse .step-label {
-  color: #ef4444;
+  color: var(--clr-accent);
 }
 
 @keyframes pulseScale {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 0, 0, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(212, 0, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 0, 0, 0); }
 }
 
 .tracking-info-details {
@@ -281,7 +281,7 @@
 }
 
 .simulate-next-btn {
-  background: #0f172a;
+  background: var(--clr-student);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
@@ -289,10 +289,11 @@
   border-radius: var(--radius-sm);
   transition: background 0.2s;
   align-self: flex-start;
+  cursor: pointer;
 }
 
 .simulate-next-btn:hover {
-  background: #1e293b;
+  background: var(--clr-student-light);
 }
 
 /* ---- Voluntary Profile Card ---- */

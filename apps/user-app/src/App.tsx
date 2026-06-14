@@ -140,43 +140,91 @@ export default function App(): React.ReactElement {
   }
 
   return (
-    <div className="app-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '75px' }}>
+    <div className="app-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '30px' }}>
       
-      {/* PERSISTENT HEADER (Navbar identical on all screens) */}
-      <header className="home-header">
-        <div className="header-logo" onClick={() => setCurrentScreen('Home')}>
-          <div className="logo-badge">R</div>
-          <div>
-            <span className="logo-title">Rozza Express</span>
-            <span className="logo-subtitle">Rosmini College Tuck Shop</span>
-          </div>
+      {/* SCHOOL TOP UTILITY BAR */}
+      <div className="bar">
+        <div>
+          <a href="https://rosmini.bridge.school.nz/absence" target="_blank" rel="noreferrer">
+            <i className="fas fa-user-minus"></i> Abcences
+          </a>
+        </div>
+        <div>
+          <a href="https://www.rosmini.school.nz/notices" target="_blank" rel="noreferrer">
+            <i className="fas fa-bullhorn"></i> Daily Notices
+          </a>
+        </div>
+        <div>
+          <a href="https://rosmini.bridge.school.nz/" target="_blank" rel="noreferrer">
+            <i className="fas fa-user-circle"></i> Login/Portal
+          </a>
+        </div>
+        <div>
+          <a href="https://www.rosmini.school.nz/calendar" target="_blank" rel="noreferrer">
+            <i className="fas fa-calendar-alt"></i> Upcoming events
+          </a>
+        </div>
+        <div>
+          <a href="https://www.rosmini.school.nz/contact-us" target="_blank" rel="noreferrer">
+            <i className="fas fa-phone-alt"></i> Contact us
+          </a>
+        </div>
+      </div>
+
+      {/* SCHOOL MAIN NAVIGATION BAR */}
+      <div className="navbar">
+        <a href="https://www.rosmini.school.nz/" className="nav-item">Home</a>
+        <a href="https://www.rosmini.school.nz/about-rosmini" className="nav-item">About us</a>
+        <a href="https://www.rosmini.school.nz/life-rosmini" className="nav-item">Services</a>
+        <div className="nav-item nav-logo-link" onClick={() => setCurrentScreen('Home')}>
+          <img src="https://rosmini2022.ibcdn.nz/media/2022_08_04_rosmini_logo_full.svg" alt="Rosmini College Full Logo" />
+        </div>
+        <span className="nav-item active" onClick={() => setCurrentScreen('Home')}>Food</span>
+        <a href="https://www.rosmini.school.nz/community" className="nav-item">Community</a>
+        <a href="https://www.rosmini.school.nz/academic" className="nav-item">History</a>
+      </div>
+
+      {/* TUCKSHOP INTEGRATED SUB-NAV */}
+      <div className="tuckshop-sub-nav">
+        <div className="sub-nav-links">
+          <button 
+            className={`sub-nav-btn ${currentScreen === 'Home' ? 'active' : ''}`} 
+            onClick={() => setCurrentScreen('Home')}
+          >
+            Tuckshop Menu
+          </button>
+          <button 
+            className={`sub-nav-btn ${currentScreen === 'Wallet' ? 'active' : ''}`} 
+            onClick={() => setCurrentScreen('Wallet')}
+          >
+            My Wallet
+          </button>
+          <button 
+            className={`sub-nav-btn ${currentScreen === 'Tracking' ? 'active' : ''}`} 
+            onClick={() => setCurrentScreen('Tracking')}
+          >
+            Order Tracking
+          </button>
         </div>
 
-        <nav className="header-nav">
-          <button className={`nav-btn ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>Home</button>
-          <button className={`nav-btn ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>Wallet</button>
-          <button className={`nav-btn ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>Tracking</button>
-        </nav>
-
-        <div className="header-actions">
-          <div className="points-pill" onClick={() => setCurrentScreen('Wallet')}>
-            <span className="points-icon">⚡</span>
-            <span className="points-count">{currentUser.loyaltyPoints} pts</span>
+        <div className="sub-nav-actions">
+          <div className="sub-nav-points" onClick={() => setCurrentScreen('Wallet')}>
+            ⚡ <span className="sub-nav-points-val">{currentUser.loyaltyPoints} pts</span>
           </div>
-          <button className="cart-pill" onClick={() => setCartOpen(true)}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <button className="sub-nav-cart" onClick={() => setCartOpen(true)}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"/>
               <circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            <span className="cart-text">Cart</span>
-            {cartCount > 0 && <span className="cart-count-badge">{cartCount}</span>}
+            <span>Cart</span>
+            {cartCount > 0 && <span className="sub-nav-cart-badge">{cartCount}</span>}
           </button>
         </div>
-      </header>
+      </div>
 
       {/* SCREEN ROUTING */}
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, paddingBottom: '2rem' }}>
         {currentScreen === 'Home' && (
           <Home
             currentUser={currentUser}
@@ -200,22 +248,6 @@ export default function App(): React.ReactElement {
           />
         )}
       </main>
-
-      {/* PERSISTENT BOTTOM NAVIGATION BAR */}
-      <footer className="footer-nav-bar">
-        <button className={`footer-nav-item ${currentScreen === 'Home' ? 'active' : ''}`} onClick={() => setCurrentScreen('Home')}>
-          <span className="footer-nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-        <button className={`footer-nav-item ${currentScreen === 'Wallet' ? 'active' : ''}`} onClick={() => setCurrentScreen('Wallet')}>
-          <span className="footer-nav-icon">💳</span>
-          <span>Wallet</span>
-        </button>
-        <button className={`footer-nav-item ${currentScreen === 'Tracking' ? 'active' : ''}`} onClick={() => setCurrentScreen('Tracking')}>
-          <span className="footer-nav-icon">📍</span>
-          <span>Tracking</span>
-        </button>
-      </footer>
 
       {/* CART DRAWER SLIDE-OUT MODAL */}
       <div className={`cart-overlay ${cartOpen ? 'open' : ''}`} onClick={() => { setCartOpen(false); setCartError(''); }} />

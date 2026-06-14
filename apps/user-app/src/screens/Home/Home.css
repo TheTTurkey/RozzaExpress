@@ -152,14 +152,15 @@
 
 /* ---- Hero Container ---- */
 .hero-container {
-  background: linear-gradient(135deg, #0f1c3f 0%, #081026 100%); /* Deep navy blue matching design */
+  background: #f0f7ff; /* Soft light-blue background */
   padding: 3.5rem 4rem;
-  color: #fff;
+  color: #0f172a;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 3rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
+  border-bottom: 1px solid #cbd5e1;
 }
 
 .hero-details {
@@ -168,7 +169,7 @@
 
 .hero-greeting {
   font-size: 1.1rem;
-  color: #94a3b8;
+  color: #64748b;
   margin-bottom: 0.25rem;
 }
 
@@ -177,12 +178,12 @@
   font-weight: 850;
   letter-spacing: -0.03em;
   margin-bottom: 0.75rem;
-  color: #fff;
+  color: var(--clr-student);
 }
 
 .hero-desc {
   font-size: 1.15rem;
-  color: #cbd5e1;
+  color: #475569;
   line-height: 1.5;
   max-width: 500px;
   margin-bottom: 2rem;
@@ -196,8 +197,8 @@
 }
 
 .toggle-container {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
   padding: 0.3rem;
   border-radius: 999px;
   display: flex;
@@ -209,44 +210,44 @@
   border-radius: 999px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #64748b;
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .toggle-btn.active-amber {
-  background: #f59e0b; /* Amber pre-order background */
-  color: #0f172a;
+  background: var(--clr-accent); /* Rosmini Red for active pre-order */
+  color: #ffffff;
 }
 
 .toggle-btn.active-grey {
-  background: rgba(255, 255, 255, 0.15); /* Grey delivery background */
-  color: #fff;
+  background: var(--clr-student); /* Rosmini Blue for active delivery */
+  color: #ffffff;
 }
 
 .order-now-btn {
-  background: #ef4444; /* Bold red button */
+  background: var(--clr-accent); /* Rosmini Red button */
   color: #fff;
   font-weight: 700;
   font-size: 0.95rem;
   padding: 0.75rem 1.75rem;
   border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 2px 8px rgba(212, 0, 0, 0.2);
   transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .order-now-btn:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
+  background: var(--clr-accent-2);
+  transform: translateY(-1px);
 }
 
 /* Radial progress rewards */
 .hero-rewards-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-md);
   padding: 2rem;
   display: flex;
   align-items: center;
@@ -255,12 +256,12 @@
   width: 100%;
   cursor: pointer;
   transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .hero-rewards-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  background: #f8fafc;
 }
 
 .radial-progress-container {
@@ -277,13 +278,13 @@
 
 .progress-bg {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
+  stroke: #e2e8f0;
   stroke-width: 8;
 }
 
 .progress-fill {
   fill: none;
-  stroke: #fbbf24; /* Amber loader */
+  stroke: var(--clr-accent); /* Rosmini Red progress */
   stroke-width: 8;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.35s;
@@ -298,6 +299,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: #0f172a;
 }
 
 .radial-points-icon {
@@ -313,7 +315,7 @@
 
 .radial-points-lbl {
   font-size: 0.65rem;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .rewards-summary {
@@ -325,24 +327,24 @@
 .rewards-summary h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--clr-student);
 }
 
 .rewards-summary .rewards-hint {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #64748b;
   line-height: 1.4;
 }
 
 .rewards-summary .rewards-hint span {
-  color: #fbbf24;
+  color: var(--clr-accent);
   font-weight: 700;
 }
 
 .earn-more-link {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: #64748b;
   text-align: left;
   margin-top: 0.5rem;
   transition: color 0.2s;
@@ -440,7 +442,7 @@
 }
 
 .badge--save {
-  background: #0f172a; /* SAVE $1 */
+  background: var(--clr-student); /* Rosmini Blue */
 }
 
 .badge--new {
@@ -488,7 +490,7 @@
 .deal-points {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #d97706; /* Amber point indicator */
+  color: var(--clr-accent); /* Rosmini Red */
   margin-top: 0.5rem;
 }
 
@@ -579,7 +581,7 @@
 .add-to-cart-small {
   width: 32px;
   height: 32px;
-  background: #ef4444;
+  background: var(--clr-student);
   color: #fff;
   border-radius: 50%;
   font-size: 1.2rem;
@@ -587,12 +589,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 2px 6px rgba(15, 88, 157, 0.15);
   transition: background 0.2s, transform 0.2s;
 }
 
 .add-to-cart-small:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--clr-student-light);
   transform: scale(1.08);
 }
 
@@ -632,9 +634,9 @@
 }
 
 .filter-tag-pill.active {
-  background: #0f172a;
+  background: var(--clr-student);
   color: #fff;
-  border-color: #0f172a;
+  border-color: var(--clr-student);
 }
 
 .tag-remove-icon {
@@ -770,7 +772,7 @@
 }
 
 .menu-add-btn {
-  background: #0f172a;
+  background: var(--clr-student);
   color: #fff;
   font-weight: 700;
   font-size: 0.85rem;
@@ -780,7 +782,7 @@
 }
 
 .menu-add-btn:hover:not(:disabled) {
-  background: #1e293b;
+  background: var(--clr-student-light);
 }
 
 .menu-add-btn:disabled {
