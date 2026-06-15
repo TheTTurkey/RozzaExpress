@@ -1,0 +1,2016 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rozza Express - Rosmini College Tuck Shop</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body class="logged-out">
+
+  <!-- ============================================ -->
+  <!-- STUDENT LOGIN GATEWAY (DOMAIN VALIDATED) -->
+  <!-- ============================================ -->
+  <div class="login-screen-overlay" id="login-overlay">
+    <div class="login-card">
+      <div class="login-logo">⚡</div>
+      <h2>Rozza Express</h2>
+      <p class="subtitle">Rosmini College Tuck Shop - AI Hackathon Portal</p>
+      
+      <!-- Error notification box -->
+      <div class="login-error" id="login-error-box"></div>
+
+      <div class="login-form-group">
+        <label for="student-name">Student Name</label>
+        <input type="text" id="student-name" class="login-input" value="Josh Tuilagi" placeholder="e.g. Josh Tuilagi">
+      </div>
+
+      <div class="login-form-group">
+        <label for="student-email">Rosmini Student Email</label>
+        <input type="email" id="student-email" class="login-input" value="22235@rosmini.school.nz" placeholder="studentID@rosmini.school.nz">
+        <div class="login-input-hint">Must be a <span>@rosmini.school.nz</span> account starting with a student ID number.</div>
+      </div>
+      
+      <div class="login-form-group">
+        <label for="student-password">Password</label>
+        <input type="password" id="student-password" class="login-input" value="••••••••" placeholder="Enter password">
+      </div>
+
+      <button class="btn-login" onclick="validateStudentLogin()">Sign In with Rosmini Account</button>
+    </div>
+  </div>
+
+  <!-- Header Section (Visible after login) -->
+  <header class="header-wrapper">
+    <div class="container header-container">
+      <!-- Logo -->
+      <div class="brand" onclick="switchTab('home')">
+        <div class="logo-circle">⚡</div>
+        <div class="brand-text">
+          <h1>Rozza Express</h1>
+          <p>Rosmini College Tuck Shop</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" id="tab-btn-home" onclick="switchTab('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Home
+        </button>
+        <button class="nav-tab-btn" id="tab-btn-menu" onclick="switchTab('menu')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v14M12 22v-3M16 2v4c0 1.5-1 2-2 2h-4C9 8 8 7.5 8 6V2"/></svg>
+          Menu
+        </button>
+        <button class="nav-tab-btn" id="tab-btn-rewards" onclick="switchTab('rewards')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34M12 2a4 4 0 0 1 4 4v6H8V6a4 4 0 0 1 4-4z"/></svg>
+          Rewards
+        </button>
+      </nav>
+
+      <!-- Cart & Balance & Points Info -->
+      <div class="header-actions">
+        <!-- Balance Wallet Pill -->
+        <div class="balance-pill" onclick="openTopUpModal()">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+          <span id="header-balance">$35.00</span>
+        </div>
+        <!-- Points Pill -->
+        <div class="points-pill" onclick="switchTab('rewards')">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span id="header-points">425 pts</span>
+        </div>
+        <!-- Cart Pill -->
+        <div class="cart-pill" onclick="toggleCart(true)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Cart
+          <span class="cart-badge" id="cart-badge-count" style="display: none;">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="container">
+
+    <!-- Voluntary Hours Notification Banner -->
+    <div class="volunteer-banner" id="volunteer-banner">
+      <div class="volunteer-left">
+        <div class="volunteer-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="volunteer-text">
+          <h4>Voluntary Delivery Program</h4>
+          <p>Earn credit towards your school service certificate by delivering tuckshop meals to classmates.</p>
+        </div>
+      </div>
+      <div class="volunteer-right">
+        <div class="volunteer-hours-val" id="volunteer-hours-val">3.5 hrs</div>
+        <div class="volunteer-hours-lbl">Voluntary Hours Earned</div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- HOME TAB PANE -->
+    <!-- ============================================ -->
+    <section class="tab-pane active" id="pane-home">
+      <!-- Hero Banner -->
+      <div class="hero-card">
+        <div class="hero-left">
+          <p class="greeting-label">Good afternoon,</p>
+          <h2 id="home-greeting-name">Josh Tuilagi <span class="wave-hand">👋</span></h2>
+          <p class="subtext">Order your interval & lunch from Rosmini's tuck shop —<br>skip the queue, earn points.</p>
+          
+          <div class="toggle-container">
+            <button class="toggle-btn active" id="toggle-preorder" onclick="setDeliveryMode('preorder')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Pre-Order
+            </button>
+            <button class="toggle-btn" id="toggle-delivery" onclick="setDeliveryMode('delivery')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              Delivery
+            </button>
+          </div>
+          <br>
+          <button class="btn-red" onclick="switchTab('menu')">
+            Order Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          
+          <button class="btn-purple" onclick="openOutsideOrderModal()">
+            Order Outside Food
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </button>
+        </div>
+
+        <div class="hero-right">
+          <!-- Circular SVG Progress Ring -->
+          <div class="progress-ring-container">
+            <svg class="progress-ring-svg">
+              <circle class="progress-ring-circle-bg" cx="70" cy="70" r="58"></circle>
+              <circle class="progress-ring-circle" id="hero-progress-ring" cx="70" cy="70" r="58"></circle>
+            </svg>
+            <div class="progress-ring-text-center">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span class="progress-ring-value" id="hero-progress-value">425</span>
+              <span class="progress-ring-label">pts</span>
+            </div>
+          </div>
+          <h4 class="rewards-card-title">Rozza Rewards</h4>
+          <p class="rewards-card-desc"><span id="hero-points-needed">75 pts</span> to a free sausage roll!</p>
+          <button class="btn-earn-more" onclick="switchTab('rewards')">
+            Earn more
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Today's Deals Section -->
+      <div class="section-header">
+        <h3>Today's Deals</h3>
+        <a href="#" class="see-all-link" onclick="switchTab('menu'); return false;">
+          See all
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+
+      <!-- Deals Grid -->
+      <div class="deals-grid" id="deals-container">
+        <!-- Deal items injected by JS -->
+      </div>
+
+      <!-- Collapsible Research Accordion -->
+      <div class="analytics-accordion" id="analytics-panel">
+        <div class="analytics-header" onclick="toggleAnalyticsPanel()">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            Tuckshop Impact Analytics & Research (Wait Times & Queue Supervision)
+          </h3>
+          <div class="analytics-icon-arrow" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="analytics-body">
+          <div class="analytics-col">
+            <h4>Queue Wait Times (Lunch Bell Peak)</h4>
+            <div class="bar-chart-container">
+              <div class="bar-row">
+                <div class="bar-label">
+                  <span>Standard Tuckshop Line</span>
+                  <span class="highlight">12 - 18 minutes</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill red" style="width: 90%;"></div>
+                </div>
+              </div>
+              <div class="bar-row">
+                <div class="bar-label">
+                  <span>With Rozza Express App</span>
+                  <span class="app-highlight">Under 1 minute</span>
+                </div>
+                <div class="bar-bg">
+                  <div class="bar-fill green" style="width: 8%;"></div>
+                </div>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--color-secondary); margin-top: 16px; line-height: 1.4;">
+              * Standing in line consumes almost half of a student's lunch break. Digital ordering eliminates queues and guarantees food items.
+            </p>
+          </div>
+          <div class="analytics-col">
+            <h4>Daily Tuckshop Traffic Volumes</h4>
+            <div class="metrics-summary-grid">
+              <div class="metric-sum-card">
+                <h5>~390</h5>
+                <p>Daily Active Customers</p>
+              </div>
+              <div class="metric-sum-card">
+                <h5>~155</h5>
+                <p>Interval (Recess) Rush</p>
+              </div>
+              <div class="metric-sum-card">
+                <h5>~235</h5>
+                <p>Lunch Hour Orders</p>
+              </div>
+              <div class="metric-sum-card">
+                <h5>-90%</h5>
+                <p>Queue Crowd Density</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How it Works & Recent Orders Split Grid -->
+      <div class="split-grid">
+        <div class="vertical-card">
+          <h3>How It Works</h3>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <div class="step-text">Choose Pre-Order or Delivery above</div>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <div class="step-text">Pick your food from the Menu</div>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <div class="step-text">Pay at checkout & earn points</div>
+            </div>
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <div class="step-text">Collect at the counter or get it delivered</div>
+            </div>
+          </div>
+          <button class="btn-start-order" onclick="volunteerDelivery()">
+            Sign up to Deliver an Order (+0.5 hrs)
+          </button>
+        </div>
+
+        <div class="white-panel">
+          <h3>Recent Orders</h3>
+          <div class="order-rows-list" id="recent-orders-container">
+            <!-- Order list items injected by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- MENU TAB PANE -->
+    <!-- ============================================ -->
+    <section class="tab-pane" id="pane-menu">
+      <div class="menu-view-header">
+        <h2>Menu</h2>
+        <p>Fresh food made daily · Order before 12:00pm for interval</p>
+      </div>
+
+      <!-- Menu Categories & Dietary Filters Grid -->
+      <div class="menu-toolbar">
+        <div class="menu-categories-bar" id="menu-categories-container">
+          <button class="category-pill active" onclick="filterMenu('All', this)">
+            🍽️ All
+          </button>
+          <button class="category-pill" onclick="filterMenu('Burgers', this)">
+            🍔 Burgers
+          </button>
+          <button class="category-pill" onclick="filterMenu('Pies & Rolls', this)">
+            🥧 Pies & Rolls
+          </button>
+          <button class="category-pill" onclick="filterMenu('Drinks', this)">
+            🥤 Drinks
+          </button>
+          <button class="category-pill" onclick="filterMenu('Snacks', this)">
+            🍟 Snacks
+          </button>
+        </div>
+
+        <!-- Allergy/Dietary Filters Checklist -->
+        <div class="dietary-filters-panel">
+          <span class="filter-title">Allergy Filters:</span>
+          <label class="dietary-filter-checkbox">
+            <input type="checkbox" id="filter-veg" onchange="applyDietaryFilter()"> Vegetarian (V)
+          </label>
+          <label class="dietary-filter-checkbox">
+            <input type="checkbox" id="filter-gf" onchange="applyDietaryFilter()"> Gluten Free (GF)
+          </label>
+          <label class="dietary-filter-checkbox">
+            <input type="checkbox" id="filter-df" onchange="applyDietaryFilter()"> Dairy Free (DF)
+          </label>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="menu-products-container">
+        <!-- Products injected by JS -->
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- REWARDS TAB PANE -->
+    <!-- ============================================ -->
+    <section class="tab-pane" id="pane-rewards">
+      <div class="menu-view-header">
+        <h2>Rozza Rewards</h2>
+        <p>Earn points every order, redeem for free food</p>
+      </div>
+
+      <!-- Membership plans options -->
+      <div class="section-header" style="margin-bottom: 16px;">
+        <h3>Membership club plans</h3>
+      </div>
+      <div class="membership-deck">
+        <!-- Basic Card -->
+        <div class="membership-card active" id="membership-card-basic">
+          <h4>Basic Student</h4>
+          <div class="membership-price">$0.00 <span>/ month</span></div>
+          <ul class="membership-perks">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              1.0x Point Multiplier
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Pre-order options
+            </li>
+          </ul>
+          <button class="btn-membership-buy" disabled>Current Plan</button>
+        </div>
+
+        <!-- Silver Card -->
+        <div class="membership-card" id="membership-card-silver">
+          <h4>Silver Member</h4>
+          <div class="membership-price">$5.00 <span>/ month</span></div>
+          <ul class="membership-perks">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              1.2x Point Multiplier
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Silver Badge on ordering profile
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Priority volunteer queues
+            </li>
+          </ul>
+          <button class="btn-membership-buy" onclick="buyMembershipPlan('Silver', 5.00)">Upgrade to Silver</button>
+        </div>
+
+        <!-- Gold Card -->
+        <div class="membership-card" id="membership-card-gold">
+          <h4>Gold Member</h4>
+          <div class="membership-price">$10.00 <span>/ month</span></div>
+          <ul class="membership-perks">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              1.5x Point Multiplier
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Free delivery on all orders
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              No outside food convenience fees
+            </li>
+          </ul>
+          <button class="btn-membership-buy" onclick="buyMembershipPlan('Gold', 10.00)">Upgrade to Gold</button>
+        </div>
+      </div>
+
+      <!-- Rewards Dashboard Metrics Grid -->
+      <div class="rewards-metrics-grid">
+        <!-- Large Widget (Current Balance) -->
+        <div class="rewards-large-widget">
+          <h4>Current Balance</h4>
+          <div class="progress-ring-container">
+            <svg class="progress-ring-svg">
+              <circle class="progress-ring-circle-bg" cx="70" cy="70" r="58"></circle>
+              <circle class="progress-ring-circle" id="rewards-progress-ring" cx="70" cy="70" r="58"></circle>
+            </svg>
+            <div class="progress-ring-text-center">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span class="progress-ring-value" id="rewards-progress-value">425</span>
+              <span class="progress-ring-label">points</span>
+            </div>
+          </div>
+          <p class="rewards-card-desc"><span id="rewards-points-needed">75 more</span> for a free sausage roll</p>
+        </div>
+
+        <!-- Metric Widget 2 -->
+        <div class="rewards-metric-card">
+          <div class="metric-icon-box icon-orange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div class="metric-text-box">
+            <p>Total Earned</p>
+            <h3 id="stat-total-earned">605 pts</h3>
+          </div>
+        </div>
+
+        <!-- Metric Widget 3 -->
+        <div class="rewards-metric-card">
+          <div class="metric-icon-box icon-pink">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div class="metric-text-box">
+            <p>Redeemed</p>
+            <h3 id="stat-redeemed">300 pts</h3>
+          </div>
+        </div>
+
+        <!-- Metric Widget 4 -->
+        <div class="rewards-metric-card">
+          <div class="metric-icon-box icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="metric-text-box">
+            <p>Orders Made</p>
+            <h3 id="stat-orders-made">7</h3>
+          </div>
+        </div>
+
+        <!-- Metric Widget 5 -->
+        <div class="rewards-metric-card">
+          <div class="metric-icon-box icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="metric-text-box">
+            <p>Next Reward</p>
+            <h3 id="stat-next-reward">75 pts away</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Redeem & History Sections -->
+      <div class="rewards-split-grid">
+        <div class="redeem-section">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
+            Redeem Rewards
+          </h3>
+          <div class="rewards-redeem-grid" id="redeemable-rewards-container">
+            <!-- Redeemable cards injected by JS -->
+          </div>
+        </div>
+
+        <div class="history-section">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Points & Wallet History
+          </h3>
+          <div class="white-panel" style="padding: 24px;">
+            <div class="history-list" id="points-history-container">
+              <!-- History lines injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HACKATHON TEAM CREDITS & ROLES BOARD -->
+    <footer class="hackathon-credits">
+      <div class="credits-title">AI Hackathon Tuckshop App: User-Side</div>
+      <div class="credits-members">
+        <div class="credit-tag">Joseph <span>(Front-end)</span></div>
+        <div class="credit-tag">Austin <span>(Back-end)</span></div>
+        <div class="credit-tag">Rashane <span>(Research)</span></div>
+        <div class="credit-tag">Orlando <span>(Design)</span></div>
+        <div class="credit-tag">Liam T <span>(Hybrid)</span></div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ============================================ -->
+  <!-- CART DRAWER OVERLAY & PANEL -->
+  <!-- ============================================ -->
+  <div class="cart-drawer-overlay" id="cart-overlay" onclick="toggleCart(false)"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+        Your Cart
+      </h3>
+      <button class="btn-close-drawer" onclick="toggleCart(false)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Cart items scrollable body -->
+    <div class="cart-items-container" id="cart-items-list">
+      <!-- Dynamic cart items list or empty state injected by JS -->
+    </div>
+
+    <!-- Checkout Footer -->
+    <div class="cart-footer">
+      <div class="cart-summary-line">
+        <span>Items Total</span>
+        <span id="cart-summary-subtotal">$0.00</span>
+      </div>
+      <div class="cart-summary-line" id="delivery-fee-line" style="display:none;">
+        <span>Delivery Handling Fee</span>
+        <span id="cart-summary-delivery">$2.00</span>
+      </div>
+      <div class="cart-summary-line points-est">
+        <span>Estimated Points</span>
+        <span id="cart-summary-points">+0 pts</span>
+      </div>
+      
+      <!-- Voluntary delivery hours option -->
+      <div class="cart-summary-line" id="cart-volunteer-choice" style="margin: 8px 0; display:none;">
+        <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:var(--color-accent-purple); cursor:pointer;">
+          <input type="checkbox" id="volunteer-deliver-toggle" style="accent-color:var(--color-accent-purple);"> Volunteer to deliver this order (+0.5 hrs service)
+        </label>
+      </div>
+
+      <div class="cart-summary-line total">
+        <span>Subtotal</span>
+        <span id="cart-summary-total">$0.00</span>
+      </div>
+      <button class="btn-checkout" onclick="checkoutCart()">
+        Checkout & Pay from Wallet
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- WALLET TOP-UP MODAL (SECURE BILLING) -->
+  <!-- ============================================ -->
+  <div class="modal-overlay" id="wallet-modal">
+    <div class="modal-content" style="text-align: left;">
+      <div class="cart-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
+        <h3>💰 Preload Money / Top-Up Wallet</h3>
+        <button class="btn-close-drawer" onclick="closeTopUpModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      
+      <p style="font-size: 14px; color: var(--color-secondary); margin-bottom: 16px;">
+        Current Wallet Balance: <strong style="color: var(--color-accent-green-dark); font-size: 16px;" id="wallet-current-bal">$35.00</strong>
+      </p>
+
+      <div class="login-form-group">
+        <label>Select Amount</label>
+        <div class="wallet-topup-grid">
+          <button class="btn-topup-choice" onclick="selectTopUpAmount(10)">+$10.00</button>
+          <button class="btn-topup-choice" onclick="selectTopUpAmount(20)">+$20.00</button>
+          <button class="btn-topup-choice" onclick="selectTopUpAmount(50)">+$50.00</button>
+        </div>
+      </div>
+
+      <div class="login-form-group">
+        <label for="topup-custom-amount">Or Custom Amount ($)</label>
+        <input type="number" id="topup-custom-amount" class="input-modal" placeholder="0.00" min="1">
+      </div>
+
+      <!-- Payment details mock -->
+      <div style="border-top: 1px solid var(--card-border); padding-top: 16px; margin-top: 16px;">
+        <label style="display:block; font-size:12px; font-weight:700; color:var(--color-secondary); margin-bottom:8px; text-transform:uppercase;">Secure Payment Processing</label>
+        
+        <input type="text" class="input-modal" value="4000 1284 9283 1928" placeholder="Card Number">
+        <div class="modal-split-fields">
+          <input type="text" class="input-modal" value="12/29" placeholder="MM/YY">
+          <input type="password" class="input-modal" value="•••" placeholder="CVV">
+        </div>
+      </div>
+
+      <button class="btn-checkout" style="background-color: var(--color-accent-green); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);" onclick="submitWalletTopUp()">
+        Authorize Secure Top-Up
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- OUTSIDE FOOD PARTNER ORDER MODAL -->
+  <!-- ============================================ -->
+  <div class="modal-overlay" id="outside-order-modal">
+    <div class="modal-content" style="text-align: left;">
+      <div class="cart-header" style="padding: 0 0 16px 0; margin-bottom: 20px;">
+        <h3>🍔 Order Outside Food to Tuckshop</h3>
+        <button class="btn-close-drawer" onclick="closeOutsideOrderModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--color-secondary); margin-bottom: 16px; line-height: 1.4;">
+        Get food from nearby fast food restaurants delivered directly to the tuckshop counters. We handle collection and holds!
+      </p>
+
+      <div class="login-form-group">
+        <label for="outside-restaurant">Select Restaurant Partner</label>
+        <select id="outside-restaurant" class="select-modal" onchange="calculateOutsideTotal()">
+          <option value="McDonald's">McDonald's</option>
+          <option value="KFC">KFC</option>
+          <option value="Subway">Subway</option>
+          <option value="Pizza Hut">Pizza Hut</option>
+        </select>
+      </div>
+
+      <div class="login-form-group">
+        <label for="outside-food-name">What food items do you want?</label>
+        <input type="text" id="outside-food-name" class="input-modal" placeholder="e.g. McChicken Meal, 10pc Nuggets" required>
+      </div>
+
+      <div class="login-form-group">
+        <label for="outside-food-cost">Food Cost ($)</label>
+        <input type="number" id="outside-food-cost" class="input-modal" placeholder="0.00" min="1" step="0.01" oninput="calculateOutsideTotal()" required>
+      </div>
+
+      <!-- Fees list -->
+      <div style="background-color: #f8fafc; border: 1px solid var(--card-border); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+        <div class="cart-summary-line" style="margin-bottom: 8px;">
+          <span>Food Cost</span>
+          <span id="outside-billing-cost">$0.00</span>
+        </div>
+        <div class="cart-summary-line" style="margin-bottom: 8px;">
+          <span>Tuckshop Handling Fee</span>
+          <span id="outside-billing-fee">$3.50</span>
+        </div>
+        <div class="cart-summary-line total" style="border-top:1px solid #cbd5e1; padding-top:8px;">
+          <span>Total Outside Cost</span>
+          <span id="outside-billing-total">$0.00</span>
+        </div>
+      </div>
+
+      <button class="btn-checkout" onclick="submitOutsideFoodOrder()">
+        Place Outside Order
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- TOAST NOTIFICATION -->
+  <!-- ============================================ -->
+  <div class="toast-container" id="toast-notify">
+    <div class="toast-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="toast-text" id="toast-message">Item added to cart!</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- CONFIRMATION DIALOG MODAL -->
+  <!-- ============================================ -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content">
+      <div class="modal-icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h3 id="modal-heading">Order Placed!</h3>
+      <p id="modal-body">Your tuck shop order has been successfully placed. Skip the queue and collect it at interval!</p>
+      <button class="btn-modal-close" onclick="closeModal()">Awesome!</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- APP JAVASCRIPT STATE CONTROLLER -->
+  <!-- ============================================ -->
+  <script>
+    // State initialization
+    let state = {
+      isLoggedIn: false,
+      userEmail: '',
+      userName: 'Josh Tuilagi',
+      points: 425,
+      totalEarned: 605,
+      redeemed: 300,
+      ordersMade: 7,
+      deliveryMode: 'preorder',
+      balance: 35.00,
+      membershipTier: 'Basic', // Basic, Silver, Gold
+      volunteerHours: 3.5,
+      cart: [],
+      recentOrders: [
+        { id: 'RX-1042', items: 'Burger, Juicy Juice', time: 'Today - 12:34pm', points: 95, type: 'standard' },
+        { id: 'RX-1038', items: 'Sausage Roll, Chips', time: 'Yesterday - 1:02pm', points: 60, type: 'standard' },
+        { id: 'RX-1031', items: 'Mince & Cheese Pie', time: 'Mon 9 Jun - 12:55pm', points: 60, type: 'standard' }
+      ],
+      pointsHistory: [
+        { name: 'Smash Burger + Chips', time: 'Today, 12:34pm', points: 155, type: 'add' },
+        { name: '2x Juicy Juice Deal', time: 'Yesterday, 1:02pm', points: 80, type: 'add' },
+        { name: 'Redeemed: Free Juice', time: 'Mon 9 Jun', points: -300, type: 'redeem' },
+        { name: 'Mince & Cheese Pie', time: 'Fri 6 Jun', points: 60, type: 'add' },
+        { name: 'Sausage Roll Combo', time: 'Thu 5 Jun', points: 60, type: 'add' },
+        { name: 'Classic Cheeseburger', time: 'Wed 4 Jun', points: 90, type: 'add' },
+        { name: 'Sparkling Water x 2', time: 'Tue 3 Jun', points: 60, type: 'add' }
+      ]
+    };
+
+    // Load from local storage if exists
+    if (localStorage.getItem('rozza_express_state')) {
+      try {
+        state = JSON.parse(localStorage.getItem('rozza_express_state'));
+        // Always require login on page refresh or preview
+        state.isLoggedIn = false;
+      } catch (e) {
+        console.error("Failed to parse cached state, using defaults.", e);
+      }
+    }
+
+    // Save state helper
+    function saveState() {
+      localStorage.setItem('rozza_express_state', JSON.stringify(state));
+    }
+
+    // Food Menu Items data (added dietary tags and initial stock)
+    const menuItemsData = [
+      {
+        id: 'classic-cheeseburger',
+        name: 'Classic Cheeseburger',
+        category: 'Burgers',
+        description: 'Beef patty, cheese, lettuce, tomato, pickles',
+        price: 4.50,
+        points: 90,
+        tag: 'Popular',
+        dietary: [],
+        stock: 5,
+        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'smash-burger',
+        name: 'Smash Burger',
+        category: 'Burgers',
+        description: 'Double smash patty, special sauce, brioche bun',
+        price: 5.50,
+        points: 220,
+        tag: '2x PTS',
+        dietary: [],
+        stock: 8,
+        image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'loaded-cheeseburger',
+        name: 'Loaded Cheeseburger',
+        category: 'Burgers',
+        description: 'Triple stack, bacon, cheese, BBQ sauce',
+        price: 6.00,
+        points: 120,
+        tag: '',
+        dietary: [],
+        stock: 3,
+        image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'sausage-roll',
+        name: 'Sausage Roll',
+        category: 'Pies & Rolls',
+        description: 'Flaky pastry, seasoned pork mince',
+        price: 2.50,
+        points: 50,
+        tag: 'Popular',
+        dietary: [],
+        stock: 2,
+        image: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'mince-cheese-pie',
+        name: 'Mince & Cheese Pie',
+        category: 'Pies & Rolls',
+        description: 'Classic Kiwi beef mince & cheese',
+        price: 3.00,
+        points: 60,
+        tag: '',
+        dietary: [],
+        stock: 4,
+        image: 'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'chicken-mushroom-pie',
+        name: 'Chicken & Mushroom Pie',
+        category: 'Pies & Rolls',
+        description: 'Creamy chicken and mushroom filling',
+        price: 3.50,
+        points: 70,
+        tag: '',
+        dietary: [],
+        stock: 1,
+        image: 'https://images.unsplash.com/photo-1628294895520-22e9602e1c07?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'juicy-juice',
+        name: 'Juicy Juice',
+        category: 'Drinks',
+        description: 'Cold pressed fruit juice, 250ml',
+        price: 2.00,
+        points: 80,
+        tag: '2x PTS',
+        dietary: ['V', 'GF', 'DF'],
+        stock: 15,
+        image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'sparkling-water',
+        name: 'Sparkling Water',
+        category: 'Drinks',
+        description: 'Chilled sparkling water, 330ml',
+        price: 1.50,
+        points: 30,
+        tag: '',
+        dietary: ['V', 'GF', 'DF'],
+        stock: 20,
+        image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'chip-packet',
+        name: 'Chip Packet',
+        category: 'Snacks',
+        description: 'BBQ or salt & vinegar, 40g',
+        price: 1.50,
+        points: 30,
+        tag: '',
+        dietary: ['V', 'GF', 'DF'],
+        stock: 12,
+        image: 'https://images.unsplash.com/photo-1566478989037-eec170784d20?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'loaded-fries',
+        name: 'Loaded Fries',
+        category: 'Snacks',
+        description: 'Crispy fries, cheese sauce, seasoning',
+        price: 3.50,
+        points: 70,
+        tag: 'Popular',
+        dietary: ['V'],
+        stock: 6,
+        image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80'
+      }
+    ];
+
+    // Today's Deals data
+    const dealsData = [
+      {
+        id: 'deal-juicies',
+        name: '2-for-1 Juicies',
+        description: 'Interval only · Expires 1:10pm',
+        tag: '50% OFF',
+        tagClass: 'badge-red',
+        points: 80,
+        price: 2.00,
+        image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'deal-cheeseburger',
+        name: 'Cheeseburger Deal',
+        description: 'Add a drink for $1.50',
+        tag: 'DEAL',
+        tagClass: 'badge-gold',
+        points: 120,
+        price: 4.50,
+        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'deal-sausage-roll',
+        name: 'Sausage Roll Combo',
+        description: 'Sausage roll + chips',
+        tag: 'SAVE $1',
+        tagClass: 'badge-black',
+        points: 60,
+        price: 3.50,
+        image: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'deal-smash-burger',
+        name: 'Smash Burger Special',
+        description: 'Double smash, special sauce',
+        tag: 'NEW',
+        tagClass: 'badge-blue',
+        points: 110,
+        price: 5.50,
+        image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80'
+      }
+    ];
+
+    // Rewards items list (redeemable list)
+    const redeemableRewards = [
+      { id: 'reward-sausage-roll', name: 'Free Sausage Roll', points: 500, image: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=500&q=80' },
+      { id: 'reward-juice', name: 'Free Juicy Juice', points: 300, image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=500&q=80' },
+      { id: 'reward-chips', name: 'Free Bag of Chips', points: 200, image: 'https://images.unsplash.com/photo-1566478989037-eec170784d20?auto=format&fit=crop&w=500&q=80' },
+      { id: 'reward-cheeseburger', name: 'Free Cheeseburger', points: 800, image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80' },
+      { id: 'reward-pie', name: 'Free Mince & Cheese Pie', points: 350, image: 'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=500&q=80' },
+      { id: 'reward-fries', name: 'Free Loaded Fries', points: 450, image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80' }
+    ];
+
+    // -------------------------------------------------------------
+    // AUTHENTICATION CONTROLLER
+    // -------------------------------------------------------------
+    function validateStudentLogin() {
+      const emailInput = document.getElementById('student-email').value.trim();
+      const nameInput = document.getElementById('student-name').value.trim();
+      const errorBox = document.getElementById('login-error-box');
+
+      // Rule: must start with a number and end with @rosmini.school.nz
+      const rosminiRegex = /^\d+@rosmini\.school\.nz$/;
+
+      if (!nameInput) {
+        errorBox.innerText = 'Login Failed: Please enter your name.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      if (!rosminiRegex.test(emailInput)) {
+        errorBox.innerText = 'Login Failed: Gmail must be on the @rosmini.school.nz domain and start with a student ID number.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      // Hide login overlay
+      errorBox.style.display = 'none';
+      document.getElementById('login-overlay').style.display = 'none';
+      document.body.classList.remove('logged-out');
+
+      state.isLoggedIn = true;
+      state.userEmail = emailInput;
+      state.userName = nameInput;
+      saveState();
+
+      // Setup greeting and metrics
+      initializeDashboard();
+      showToast('Signed in successfully!');
+    }
+
+    // Check login state on load
+    function checkLoginState() {
+      if (state.isLoggedIn) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.body.classList.remove('logged-out');
+        initializeDashboard();
+      } else {
+        document.body.classList.add('logged-out');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // View Controllers / UI Updates
+    // -------------------------------------------------------------
+
+    // Update Greeting Name
+    function updateGreetingName() {
+      const greetingEl = document.getElementById('home-greeting-name');
+      if (greetingEl) {
+        greetingEl.innerHTML = `${state.userName || 'Student'} <span class="wave-hand">👋</span>`;
+      }
+    }
+
+    // Initialize Page Content
+    function initializeDashboard() {
+      updateGreetingName();
+      renderDeals();
+      renderRecentOrders();
+      renderMenuProducts(menuItemsData);
+      renderRedeemableRewards();
+      renderPointsHistory();
+      updatePointsDisplays();
+      updateCartUI();
+      updateVolunteerUI();
+      updateMembershipUI();
+
+      // Setup dynamic preorder state style
+      setDeliveryMode(state.deliveryMode);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkLoginState();
+    });
+
+    // Tab Switching
+    function switchTab(tabName) {
+      // Toggle button states
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Toggle panels
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      const activePane = document.getElementById(`pane-${tabName}`);
+      if (activePane) activePane.classList.add('active');
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toggle Delivery mode
+    function setDeliveryMode(mode) {
+      state.deliveryMode = mode;
+      saveState();
+
+      const preorderBtn = document.getElementById('toggle-preorder');
+      const deliveryBtn = document.getElementById('toggle-delivery');
+      const deliveryLine = document.getElementById('delivery-fee-line');
+      const volunteerChoice = document.getElementById('cart-volunteer-choice');
+
+      if (mode === 'preorder') {
+        preorderBtn.classList.add('active');
+        deliveryBtn.classList.remove('active');
+        deliveryLine.style.display = 'none';
+        volunteerChoice.style.display = 'none';
+      } else {
+        deliveryBtn.classList.add('active');
+        preorderBtn.classList.remove('active');
+        
+        // Waive delivery fee for Gold members
+        if (state.membershipTier === 'Gold') {
+          document.getElementById('cart-summary-delivery').innerText = '$0.00 (Waived)';
+        } else {
+          document.getElementById('cart-summary-delivery').innerText = '$2.00';
+        }
+        
+        deliveryLine.style.display = 'flex';
+        volunteerChoice.style.display = 'block';
+      }
+
+      updateCartUI();
+    }
+
+    // Update Global Points display & Circular progress meters
+    function updatePointsDisplays() {
+      // Header Balance & Wallet
+      document.getElementById('header-balance').innerText = `$${state.balance.toFixed(2)}`;
+      document.getElementById('header-points').innerText = `${state.points} pts`;
+
+      // Home View Points Widget
+      document.getElementById('hero-progress-value').innerText = state.points;
+      
+      // Target points for free sausage roll is 500
+      const targetVal = 500;
+      const progressPercent = Math.min((state.points / targetVal), 1);
+      
+      // Circular SVG calculations
+      // Radius = 58, Circumference = 2 * PI * 58 = 364.42
+      const circ = 2 * Math.PI * 58;
+      const strokeOffset = circ - (progressPercent * circ);
+      
+      // Update SVG offsets
+      const heroRing = document.getElementById('hero-progress-ring');
+      if (heroRing) {
+        heroRing.style.strokeDasharray = circ;
+        heroRing.style.strokeDashoffset = strokeOffset;
+      }
+
+      // Points needed alert
+      const neededPoints = Math.max(targetVal - state.points, 0);
+      const pointsText = neededPoints > 0 ? `${neededPoints} pts` : `0 pts`;
+      document.getElementById('hero-points-needed').innerText = pointsText;
+
+      // Rewards Tab Large Widget
+      document.getElementById('rewards-progress-value').innerText = state.points;
+      const rewardsRing = document.getElementById('rewards-progress-ring');
+      if (rewardsRing) {
+        rewardsRing.style.strokeDasharray = circ;
+        rewardsRing.style.strokeDashoffset = strokeOffset;
+      }
+      
+      const neededText = neededPoints > 0 ? `${neededPoints} more` : `0 more`;
+      document.getElementById('rewards-points-needed').innerText = `${neededText} for a free sausage roll`;
+
+      // Dashboard stats
+      document.getElementById('stat-total-earned').innerText = `${state.totalEarned} pts`;
+      document.getElementById('stat-redeemed').innerText = `${state.redeemed} pts`;
+      document.getElementById('stat-orders-made').innerText = state.ordersMade;
+      document.getElementById('stat-next-reward').innerText = neededPoints > 0 ? `${neededPoints} pts away` : `Unlocked!`;
+
+      // Re-render redeemable rewards list to reflect unlock/lock state
+      renderRedeemableRewards();
+    }
+
+    // Render Home - Today's Deals
+    function renderDeals() {
+      const container = document.getElementById('deals-container');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      dealsData.forEach(deal => {
+        container.innerHTML += `
+          <div class="card-item" onclick="addDealToCart('${deal.id}')" style="cursor: pointer;">
+            <div class="card-image-wrapper">
+              <span class="card-badge-overlay ${deal.tagClass}">${deal.tag}</span>
+              <img src="${deal.image}" alt="${deal.name}" class="card-image">
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">${deal.name}</h4>
+              <p class="card-desc">${deal.description}</p>
+              <div class="card-footer">
+                <span class="points-add">+${deal.points} pts</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Render Home - Recent Orders
+    function renderRecentOrders() {
+      const container = document.getElementById('recent-orders-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      state.recentOrders.forEach(order => {
+        let orderTypeBadge = '';
+        let timerWidget = '';
+
+        if (order.type === 'partner') {
+          orderTypeBadge = `<span class="order-status-badge badge-grey">Partner Food</span>`;
+          // If active timer
+          if (order.countdown && order.countdown > 0) {
+            timerWidget = `
+              <div class="delivery-countdown-bar" id="timer-box-${order.id}">
+                <div class="delivery-countdown-left">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Outside Food Delivery ETA:</span>
+                </div>
+                <span class="delivery-time-val" id="timer-${order.id}">${order.countdown}m</span>
+              </div>
+            `;
+          }
+        } else {
+          orderTypeBadge = `<span class="order-status-badge status-delivered">Delivered</span>`;
+        }
+
+        container.innerHTML += `
+          <div style="display:flex; flex-direction:column; border-bottom:1px solid var(--card-border); padding: 16px 0;">
+            <div class="order-row" style="border-bottom:none; padding:0;">
+              <div class="order-left">
+                <div class="order-icon-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="order-meta-info">
+                  <h4>${order.id}</h4>
+                  <p>${order.items}</p>
+                </div>
+              </div>
+              <div class="order-right">
+                <span class="order-time">${order.time}</span>
+                ${orderTypeBadge}
+                <span class="points-tag">+${order.points} pts</span>
+              </div>
+            </div>
+            ${timerWidget}
+          </div>
+        `;
+      });
+    }
+
+    // Render Menu View items
+    function renderMenuProducts(products) {
+      const container = document.getElementById('menu-products-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      products.forEach(prod => {
+        let badgeHtml = '';
+        if (prod.tag === 'Popular') {
+          badgeHtml = `<span class="card-badge-overlay badge-red">★ Popular</span>`;
+        } else if (prod.tag === '2x PTS') {
+          badgeHtml = `<span class="card-badge-overlay badge-gold">⚡ 2x PTS</span>`;
+        }
+
+        // Dietary tags
+        let dietaryHtml = '';
+        if (prod.dietary && prod.dietary.length > 0) {
+          dietaryHtml = '<div class="dietary-badges-container">';
+          prod.dietary.forEach(tag => {
+            dietaryHtml += `<span class="dietary-badge diet-${tag.toLowerCase()}">${tag}</span>`;
+          });
+          dietaryHtml += '</div>';
+        }
+
+        // Stock status
+        let stockHtml = '';
+        let isOutOfStock = prod.stock <= 0;
+        
+        if (prod.stock === 0) {
+          stockHtml = `<span class="stock-status-label stock-out">Out of stock</span>`;
+          badgeHtml = `<span class="card-badge-overlay badge-black">OUT OF STOCK</span>`;
+        } else if (prod.stock <= 3) {
+          stockHtml = `<span class="stock-status-label stock-low">Only ${prod.stock} left!</span>`;
+        } else {
+          stockHtml = `<span class="stock-status-label stock-ok">${prod.stock} in stock</span>`;
+        }
+
+        container.innerHTML += `
+          <div class="card-item ${isOutOfStock ? 'out-of-stock' : ''}">
+            <div class="card-image-wrapper">
+              ${badgeHtml}
+              <img src="${prod.image}" alt="${prod.name}" class="card-image">
+            </div>
+            <div class="card-content">
+              <h4 class="card-title">${prod.name}</h4>
+              <p class="card-desc">${prod.description}</p>
+              ${dietaryHtml}
+              ${stockHtml}
+              <div class="card-footer" style="margin-top:16px;">
+                <div class="product-price-row">
+                  <div class="product-price-info">
+                    <span class="product-price">$${prod.price.toFixed(2)}</span>
+                    <span class="points-add">+${prod.points} pts</span>
+                  </div>
+                  <button class="btn-add-cart" onclick="addItemToCart('${prod.id}')" ${isOutOfStock ? 'disabled' : ''}>
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Filter Menu products list
+    let currentCategory = 'All';
+    function filterMenu(category, btnElement) {
+      currentCategory = category;
+      // Toggle category active styles
+      document.querySelectorAll('.category-pill').forEach(pill => pill.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      applyDietaryFilter();
+    }
+
+    // Apply Allergy / Dietary Checkbox Filters
+    function applyDietaryFilter() {
+      const isVeg = document.getElementById('filter-veg').checked;
+      const isGF = document.getElementById('filter-gf').checked;
+      const isDF = document.getElementById('filter-df').checked;
+
+      let filtered = menuItemsData;
+
+      // Filter by category first
+      if (currentCategory !== 'All') {
+        filtered = filtered.filter(item => item.category === currentCategory);
+      }
+
+      // Filter by dietary requirements
+      if (isVeg) {
+        filtered = filtered.filter(item => item.dietary.includes('V'));
+      }
+      if (isGF) {
+        filtered = filtered.filter(item => item.dietary.includes('GF'));
+      }
+      if (isDF) {
+        filtered = filtered.filter(item => item.dietary.includes('DF'));
+      }
+
+      renderMenuProducts(filtered);
+    }
+
+    // Render Rewards Tab - Redeem rewards list
+    function renderRedeemableRewards() {
+      const container = document.getElementById('redeemable-rewards-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      redeemableRewards.forEach(rew => {
+        const isLocked = state.points < rew.points;
+        const diff = rew.points - state.points;
+        
+        let overlayHtml = '';
+        let buttonHtml = '';
+        
+        if (isLocked) {
+          overlayHtml = `
+            <div class="reward-card-lock-overlay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+          `;
+          buttonHtml = `<button class="btn-redeem locked-val">-${diff}</button>`;
+        } else {
+          overlayHtml = `<span class="card-badge-overlay badge-gold" style="left:auto;right:12px;">✓ Ready!</span>`;
+          buttonHtml = `<button class="btn-redeem" onclick="redeemRewardItem('${rew.id}')">Redeem</button>`;
+        }
+
+        container.innerHTML += `
+          <div class="card-item reward-card ${isLocked ? 'locked' : ''}">
+            <div class="card-image-wrapper">
+              ${overlayHtml}
+              <img src="${rew.image}" alt="${rew.name}" class="card-image">
+            </div>
+            <div class="card-content" style="padding:16px;">
+              <h4 class="card-title" style="font-size:14px; margin-bottom:4px;">${rew.name}</h4>
+              <p class="card-desc" style="font-size:12px; margin-bottom:12px; font-weight:700; color:var(--color-secondary);">${rew.points} pts</p>
+              <div class="card-footer" style="margin-top:auto;">
+                ${buttonHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Render Rewards Tab - Points History timeline
+    function renderPointsHistory() {
+      const container = document.getElementById('points-history-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      state.pointsHistory.forEach(item => {
+        const isAdd = item.type === 'add';
+        const isRedeem = item.type === 'redeem';
+        
+        let pointSign = isAdd ? '+' : '-';
+        let pointClass = isAdd ? 'points-plus' : 'points-minus';
+        let iconMarkup = '';
+
+        if (isAdd) {
+          iconMarkup = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+        } else if (isRedeem) {
+          iconMarkup = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+        } else {
+          // billing top-up
+          iconMarkup = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
+          pointSign = '';
+          pointClass = 'points-plus';
+        }
+
+        container.innerHTML += `
+          <div class="history-row">
+            <div class="history-left">
+              <div class="history-icon-circle ${isAdd ? 'icon-plus' : 'icon-minus'}">
+                ${iconMarkup}
+              </div>
+              <div class="history-info">
+                <h4>${item.name}</h4>
+                <p>${item.time}</p>
+              </div>
+            </div>
+            <span class="history-points ${pointClass}">
+              ${pointSign}${Math.abs(item.points)} ${item.points_type || 'pts'}
+            </span>
+          </div>
+        `;
+      });
+    }
+
+    // -------------------------------------------------------------
+    // VOLUNTEER DELIVERIES AND MEMBERSHIP PLANS
+    // -------------------------------------------------------------
+    function updateVolunteerUI() {
+      document.getElementById('volunteer-hours-val').innerText = `${state.volunteerHours.toFixed(1)} hrs`;
+    }
+
+    // Volunteer deliver simulation
+    function volunteerDelivery() {
+      state.volunteerHours += 0.5;
+      
+      const now = new Date();
+      const timeStr = `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+
+      state.pointsHistory.unshift({
+        name: 'Volunteered Delivery Service',
+        time: timeStr,
+        points: 0.5,
+        points_type: 'hrs',
+        type: 'volunteer'
+      });
+
+      saveState();
+      updateVolunteerUI();
+      renderPointsHistory();
+
+      openModal("Volunteer Registered!", "Thank you for volunteering to deliver an order! You earned +0.5 hours towards your school community service certificate.");
+    }
+
+    // Membership Plan selection
+    function buyMembershipPlan(tierName, price) {
+      if (state.balance < price) {
+        showToast('Insufficient wallet balance to buy membership!');
+        openTopUpModal();
+        return;
+      }
+
+      state.balance -= price;
+      state.membershipTier = tierName;
+
+      const now = new Date();
+      const timeStr = `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+
+      state.pointsHistory.unshift({
+        name: `Upgraded to ${tierName} Club`,
+        time: timeStr,
+        points: -price,
+        points_type: 'NZD',
+        type: 'billing'
+      });
+
+      saveState();
+      updatePointsDisplays();
+      renderPointsHistory();
+      updateMembershipUI();
+
+      openModal("Membership Upgraded!", `Welcome to the ${tierName} Club! You will now receive a ${tierName === 'Gold' ? '1.5x' : '1.2x'} loyalty points multiplier and exclusive benefits.`);
+    }
+
+    function updateMembershipUI() {
+      // Set active card styles
+      document.querySelectorAll('.membership-card').forEach(card => card.classList.remove('active'));
+      const activeCard = document.getElementById(`membership-card-${state.membershipTier.toLowerCase()}`);
+      if (activeCard) {
+        activeCard.classList.add('active');
+        activeCard.querySelector('.btn-membership-buy').innerText = 'Current Plan';
+        activeCard.querySelector('.btn-membership-buy').disabled = true;
+      }
+
+      // Reset others
+      if (state.membershipTier !== 'Silver') {
+        const silverBtn = document.querySelector('#membership-card-silver .btn-membership-buy');
+        if (silverBtn) {
+          silverBtn.innerText = 'Upgrade to Silver';
+          silverBtn.disabled = false;
+        }
+      }
+      if (state.membershipTier !== 'Gold') {
+        const goldBtn = document.querySelector('#membership-card-gold .btn-membership-buy');
+        if (goldBtn) {
+          goldBtn.innerText = 'Upgrade to Gold';
+          goldBtn.disabled = false;
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // CART OPERATIONS
+    // -------------------------------------------------------------
+
+    // Open/Close Cart Drawer
+    function toggleCart(isOpen) {
+      const overlay = document.getElementById('cart-overlay');
+      const drawer = document.getElementById('cart-drawer');
+      
+      if (isOpen) {
+        overlay.classList.add('open');
+        drawer.classList.add('open');
+      } else {
+        overlay.classList.remove('open');
+        drawer.classList.remove('open');
+      }
+    }
+
+    // Add normal item to cart
+    function addItemToCart(productId) {
+      const item = menuItemsData.find(m => m.id === productId);
+      if (!item) return;
+
+      const existing = state.cart.find(c => c.id === productId);
+      if (existing) {
+        if (existing.quantity >= item.stock) {
+          showToast(`Cannot add more. Only ${item.stock} in stock!`);
+          return;
+        }
+        existing.quantity += 1;
+      } else {
+        state.cart.push({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          points: item.points,
+          image: item.image,
+          quantity: 1
+        });
+      }
+
+      updateCartUI();
+      showToast(`Added ${item.name} to cart!`);
+    }
+
+    // Add deal item to cart
+    function addDealToCart(dealId) {
+      const deal = dealsData.find(d => d.id === dealId);
+      if (!deal) return;
+
+      const existing = state.cart.find(c => c.id === dealId);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        state.cart.push({
+          id: deal.id,
+          name: deal.name,
+          price: deal.price,
+          points: deal.points,
+          image: deal.image,
+          quantity: 1
+        });
+      }
+
+      updateCartUI();
+      showToast(`Added deal "${deal.name}" to cart!`);
+    }
+
+    // Modify cart quantity
+    function updateQty(id, change) {
+      const cartItem = state.cart.find(c => c.id === id);
+      if (!cartItem) return;
+
+      // Check stock limits if standard menu item
+      const menuItem = menuItemsData.find(m => m.id === id);
+      if (change > 0 && menuItem && cartItem.quantity >= menuItem.stock) {
+        showToast(`Cannot add more. Only ${menuItem.stock} in stock!`);
+        return;
+      }
+
+      cartItem.quantity += change;
+      if (cartItem.quantity <= 0) {
+        state.cart = state.cart.filter(c => c.id !== id);
+      }
+
+      updateCartUI();
+    }
+
+    // Delete item from cart completely
+    function deleteItem(id) {
+      state.cart = state.cart.filter(c => c.id !== id);
+      updateCartUI();
+    }
+
+    // Synchronize Cart Badge Count and Drawer List
+    function updateCartUI() {
+      const cartList = document.getElementById('cart-items-list');
+      const badge = document.getElementById('cart-badge-count');
+      
+      // Count total items
+      const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+      // Header Badge
+      if (totalItems > 0) {
+        badge.innerText = totalItems;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+
+      // Empty State vs Items Rows
+      if (state.cart.length === 0) {
+        cartList.innerHTML = `
+          <div class="cart-empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <p>Your cart is empty.<br>Go to the Menu to add some delicious food!</p>
+          </div>
+        `;
+        
+        document.getElementById('cart-summary-subtotal').innerText = '$0.00';
+        document.getElementById('cart-summary-points').innerText = '+0 pts';
+        document.getElementById('cart-summary-total').innerText = '$0.00';
+      } else {
+        cartList.innerHTML = '';
+        let subtotal = 0;
+        let pointsEst = 0;
+
+        state.cart.forEach(item => {
+          subtotal += item.price * item.quantity;
+          pointsEst += item.points * item.quantity;
+
+          cartList.innerHTML += `
+            <div class="cart-item-row">
+              <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+              <div class="cart-item-details">
+                <span class="cart-item-name">${item.name}</span>
+                <span class="cart-item-price">$${item.price.toFixed(2)}</span>
+                <span class="cart-item-points">+${item.points} pts</span>
+              </div>
+              <div class="cart-item-controls">
+                <div class="quantity-selector">
+                  <button class="btn-qty" onclick="updateQty('${item.id}', -1)">-</button>
+                  <span class="qty-val">${item.quantity}</span>
+                  <button class="btn-qty" onclick="updateQty('${item.id}', 1)">+</button>
+                </div>
+                <button class="btn-delete-item" onclick="deleteItem('${item.id}')">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        // Apply membership multipliers to points estimation
+        let multiplier = 1.0;
+        if (state.membershipTier === 'Silver') multiplier = 1.2;
+        if (state.membershipTier === 'Gold') multiplier = 1.5;
+        pointsEst = Math.round(pointsEst * multiplier);
+
+        // Add delivery fee if in delivery mode
+        let totalCost = subtotal;
+        if (state.deliveryMode === 'delivery' && state.membershipTier !== 'Gold') {
+          totalCost += 2.00;
+        }
+
+        document.getElementById('cart-summary-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+        document.getElementById('cart-summary-points').innerText = `+${pointsEst} pts`;
+        document.getElementById('cart-summary-total').innerText = `$${totalCost.toFixed(2)}`;
+      }
+    }
+
+    // Checkout Flow
+    function checkoutCart() {
+      if (state.cart.length === 0) {
+        showToast('Your cart is empty!');
+        return;
+      }
+
+      // Calculate checkout totals
+      let subtotal = state.cart.reduce((sum, c) => sum + (c.price * c.quantity), 0);
+      let totalCost = subtotal;
+      if (state.deliveryMode === 'delivery' && state.membershipTier !== 'Gold') {
+        totalCost += 2.00;
+      }
+
+      // Check balance
+      if (state.balance < totalCost) {
+        showToast('Insufficient wallet balance! Please preload money.');
+        openTopUpModal();
+        return;
+      }
+
+      // Check stock levels once more
+      for (let item of state.cart) {
+        const menuItem = menuItemsData.find(m => m.id === item.id);
+        if (menuItem && menuItem.stock < item.quantity) {
+          showToast(`Order failed: "${item.name}" exceeded stock limits (${menuItem.stock} left).`);
+          return;
+        }
+      }
+
+      // Deduct balance
+      state.balance -= totalCost;
+
+      // Deduct stock levels in menu items
+      state.cart.forEach(item => {
+        const menuItem = menuItemsData.find(m => m.id === item.id);
+        if (menuItem) {
+          menuItem.stock -= item.quantity;
+        }
+      });
+
+      // Points calculation
+      let pointsEst = state.cart.reduce((sum, item) => sum + (item.points * item.quantity), 0);
+      let multiplier = 1.0;
+      if (state.membershipTier === 'Silver') multiplier = 1.2;
+      if (state.membershipTier === 'Gold') multiplier = 1.5;
+      const orderPoints = Math.round(pointsEst * multiplier);
+      
+      // Update State points
+      state.points += orderPoints;
+      state.totalEarned += orderPoints;
+      state.ordersMade += 1;
+      
+      // Generate Order ID
+      const orderId = `RX-${1000 + Math.floor(Math.random() * 9000)}`;
+
+      // Format Date/Time
+      const now = new Date();
+      const timeStr = `Today - ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+
+      let itemsListStr = state.cart.map(c => `${c.quantity}x ${c.name}`).join(', ');
+      if (itemsListStr.length > 32) {
+        itemsListStr = state.cart.map(c => c.name).slice(0, 2).join(', ') + '...';
+      }
+
+      // Insert at the beginning of Recent Orders list
+      state.recentOrders.unshift({
+        id: orderId,
+        items: itemsListStr,
+        time: timeStr,
+        points: orderPoints,
+        type: 'standard'
+      });
+
+      // Insert at the beginning of Points History
+      state.pointsHistory.unshift({
+        name: itemsListStr,
+        time: `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`,
+        points: orderPoints,
+        type: 'add'
+      });
+
+      // Volunter Delivery Hour credit
+      const volunteerDeliver = document.getElementById('volunteer-deliver-toggle').checked;
+      if (state.deliveryMode === 'delivery' && volunteerDeliver) {
+        state.volunteerHours += 0.5;
+        state.pointsHistory.unshift({
+          name: 'Volunteered to Deliver Own Order',
+          time: `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`,
+          points: 0.5,
+          points_type: 'hrs',
+          type: 'volunteer'
+        });
+        document.getElementById('volunteer-deliver-toggle').checked = false;
+      }
+
+      // Clear Cart
+      state.cart = [];
+      
+      saveState();
+      updateCartUI();
+      updatePointsDisplays();
+      updateVolunteerUI();
+      renderRecentOrders();
+      renderPointsHistory();
+      applyDietaryFilter(); // Re-render menu products to show new stock counts
+
+      // Close Cart Drawer
+      toggleCart(false);
+
+      // Open Modal Confirmation
+      openModal("Order Placed!", `Your order ${orderId} has been successfully paid from your wallet. Balance remaining: $${state.balance.toFixed(2)}. Skip the queue and collect it at the counter! You earned +${orderPoints} pts.`);
+    }
+
+    // -------------------------------------------------------------
+    // WALLET TOP-UP LOGIC
+    // -------------------------------------------------------------
+    function openTopUpModal() {
+      document.getElementById('wallet-current-bal').innerText = `$${state.balance.toFixed(2)}`;
+      document.getElementById('wallet-modal').classList.add('open');
+    }
+
+    function closeTopUpModal() {
+      document.getElementById('wallet-modal').classList.remove('open');
+    }
+
+    function selectTopUpAmount(amount) {
+      document.getElementById('topup-custom-amount').value = amount.toFixed(2);
+    }
+
+    function submitWalletTopUp() {
+      const customAmountInput = document.getElementById('topup-custom-amount').value;
+      const amountVal = parseFloat(customAmountInput);
+
+      if (isNaN(amountVal) || amountVal <= 0) {
+        showToast('Please enter a valid monetary amount to top up.');
+        return;
+      }
+
+      // Add to balance
+      state.balance += amountVal;
+
+      const now = new Date();
+      const timeStr = `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+
+      // Log transaction
+      state.pointsHistory.unshift({
+        name: 'Wallet Top-up',
+        time: timeStr,
+        points: amountVal,
+        points_type: 'NZD',
+        type: 'billing'
+      });
+
+      saveState();
+      updatePointsDisplays();
+      renderPointsHistory();
+      closeTopUpModal();
+
+      document.getElementById('topup-custom-amount').value = '';
+      showToast(`Topped up +$${amountVal.toFixed(2)} successfully!`);
+    }
+
+    // -------------------------------------------------------------
+    // OUTSIDE FOOD PARTNER ORDER LOGIC
+    // -------------------------------------------------------------
+    function openOutsideOrderModal() {
+      calculateOutsideTotal();
+      document.getElementById('outside-order-modal').classList.add('open');
+    }
+
+    function closeOutsideOrderModal() {
+      document.getElementById('outside-order-modal').classList.remove('open');
+    }
+
+    function calculateOutsideTotal() {
+      const costInput = document.getElementById('outside-food-cost').value;
+      const costVal = parseFloat(costInput) || 0;
+
+      // Gold members pay $0.00 tuckshop handling fees
+      let fee = 3.50;
+      if (state.membershipTier === 'Gold') {
+        fee = 0.00;
+        document.getElementById('outside-billing-fee').innerText = '$0.00 (Waived)';
+      } else {
+        document.getElementById('outside-billing-fee').innerText = '$3.50';
+      }
+
+      const total = costVal + fee;
+
+      document.getElementById('outside-billing-cost').innerText = `$${costVal.toFixed(2)}`;
+      document.getElementById('outside-billing-total').innerText = `$${total.toFixed(2)}`;
+    }
+
+    function submitOutsideFoodOrder() {
+      const restaurant = document.getElementById('outside-restaurant').value;
+      const foodName = document.getElementById('outside-food-name').value.trim();
+      const costInput = document.getElementById('outside-food-cost').value;
+      const costVal = parseFloat(costInput) || 0;
+
+      if (!foodName) {
+        showToast('Please specify what food you want to order.');
+        return;
+      }
+      if (costVal <= 0) {
+        showToast('Please enter a valid price for the food item.');
+        return;
+      }
+
+      let fee = 3.50;
+      if (state.membershipTier === 'Gold') {
+        fee = 0;
+      }
+      const totalCost = costVal + fee;
+
+      // Check balance
+      if (state.balance < totalCost) {
+        showToast('Insufficient wallet balance to cover outside order!');
+        closeOutsideOrderModal();
+        openTopUpModal();
+        return;
+      }
+
+      // Deduct from balance
+      state.balance -= totalCost;
+
+      // Loyalty points on food cost (standard rate: 10 pts per dollar)
+      let calculatedPoints = Math.round(costVal * 10);
+      let multiplier = 1.0;
+      if (state.membershipTier === 'Silver') multiplier = 1.2;
+      if (state.membershipTier === 'Gold') multiplier = 1.5;
+      const earnedPoints = Math.round(calculatedPoints * multiplier);
+
+      // Update State points
+      state.points += earnedPoints;
+      state.totalEarned += earnedPoints;
+      state.ordersMade += 1;
+
+      // Order Details
+      const orderId = `RX-OUT-${restaurant.slice(0, 3).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+      const now = new Date();
+      const timeStr = `Today - ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+
+      // Insert at the beginning of Recent Orders list
+      const countdownMins = 10; // Simulated delivery time
+      
+      state.recentOrders.unshift({
+        id: orderId,
+        items: `${foodName} (${restaurant})`,
+        time: timeStr,
+        points: earnedPoints,
+        type: 'partner',
+        countdown: countdownMins
+      });
+
+      // Insert at the beginning of Points & Wallet History
+      state.pointsHistory.unshift({
+        name: `Outside Order: ${foodName} (${restaurant})`,
+        time: `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`,
+        points: earnedPoints,
+        type: 'add'
+      });
+
+      // Deducting charge logs
+      state.pointsHistory.unshift({
+        name: `Paid: Partner Food + Fee`,
+        time: `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`,
+        points: -totalCost,
+        points_type: 'NZD',
+        type: 'billing'
+      });
+
+      saveState();
+      updatePointsDisplays();
+      renderRecentOrders();
+      renderPointsHistory();
+
+      closeOutsideOrderModal();
+      
+      // Clear inputs
+      document.getElementById('outside-food-name').value = '';
+      document.getElementById('outside-food-cost').value = '';
+
+      openModal("Partner Order Placed!", `Your order from ${restaurant} for "${foodName}" has been successfully placed. It is scheduled to arrive at the tuckshop counters in ~10 minutes. Handling fee: $${fee.toFixed(2)}.`);
+      
+      // Start Countdown Timer
+      startCountdown(orderId, countdownMins);
+    }
+
+    // Timer handler
+    function startCountdown(orderId, startMins) {
+      let currentMins = startMins;
+      const interval = setInterval(() => {
+        currentMins--;
+        const item = state.recentOrders.find(o => o.id === orderId);
+        if (item) {
+          item.countdown = currentMins;
+          saveState();
+        }
+
+        const span = document.getElementById(`timer-${orderId}`);
+        if (span) {
+          span.innerText = `${currentMins}m`;
+        }
+
+        if (currentMins <= 0) {
+          clearInterval(interval);
+          const box = document.getElementById(`timer-box-${orderId}`);
+          if (box) {
+            box.innerHTML = `<span style="color:var(--color-accent-green-dark); font-weight:800;">✓ Arrived at Tuckshop Counter!</span>`;
+          }
+          if (item) {
+            item.countdown = 0;
+            saveState();
+          }
+        }
+      }, 60000); // decrement every minute
+    }
+
+    // -------------------------------------------------------------
+    // REWARDS REDEMPTION
+    // -------------------------------------------------------------
+    function redeemRewardItem(rewardId) {
+      const reward = redeemableRewards.find(r => r.id === rewardId);
+      if (!reward) return;
+
+      if (state.points < reward.points) {
+        showToast('Insufficient points!');
+        return;
+      }
+
+      // Deduct points
+      state.points -= reward.points;
+      state.redeemed += reward.points;
+
+      // Log in history
+      const now = new Date();
+      const timeStr = `Today, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
+      
+      state.pointsHistory.unshift({
+        name: `Redeemed: ${reward.name}`,
+        time: timeStr,
+        points: -reward.points,
+        type: 'redeem'
+      });
+
+      saveState();
+      updatePointsDisplays();
+      renderPointsHistory();
+
+      openModal("Reward Redeemed!", `You redeemed "${reward.name}" for ${reward.points} points. Show your screen at the tuck shop counter to collect your free food!`);
+    }
+
+    // Toggle Collapsible analytics panel
+    function toggleAnalyticsPanel() {
+      const panel = document.getElementById('analytics-panel');
+      panel.classList.toggle('closed');
+    }
+
+    // -------------------------------------------------------------
+    // UTILITY DIALOGS & TOASTS
+    // -------------------------------------------------------------
+
+    // Show dynamic toast banner
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast-notify');
+      const text = document.getElementById('toast-message');
+      
+      text.innerText = message;
+      toast.classList.add('show');
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Open confirmation modal
+    function openModal(title, message) {
+      document.getElementById('modal-heading').innerText = title;
+      document.getElementById('modal-body').innerText = message;
+      document.getElementById('checkout-modal').classList.add('open');
+    }
+
+    // Close modal
+    function closeModal() {
+      document.getElementById('checkout-modal').classList.remove('open');
+    }
+
+  </script>
+</body>
+</html>
