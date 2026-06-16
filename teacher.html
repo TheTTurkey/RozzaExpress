@@ -1,223 +1,829 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Staff Management Backend</title>
+<title>Rozza Express Staff Portal</title>
+<link rel="stylesheet" href="index.css">
 <style>
   body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
+    background-color: #0b192c;
+    color: #e2e8f0;
+    min-height: 100vh;
   }
-  h1 {
-    text-align: center;
+  .staff-page-wrapper {
+    padding: 24px 0 64px;
   }
-  section {
-    margin-bottom: 20px;
+  .staff-login-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 11, 25, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
   }
-  input, button {
-    margin: 5px;
+  .staff-login-card {
+    width: min(560px, calc(100% - 32px));
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 28px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    padding: 32px;
   }
-  #log {
-    background-color: #f0f0f0;
-    padding: 10px;
-    height: 200px;
-    overflow-y: auto;
-    font-family: monospace;
+  .staff-login-card h2 {
+    margin-bottom: 8px;
+    color: #f8fafc;
+  }
+  .staff-login-card p {
+    color: #94a3b8;
+    margin-bottom: 24px;
+  }
+  .staff-login-card .login-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .staff-login-card .login-field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    font-size: 14px;
+  }
+  .staff-login-card .login-field input {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+  .staff-login-card .login-field input::placeholder {
+    color: #94a3b8;
+  }
+  .staff-login-card .btn-login {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .staff-panel {
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.10);
+    border-radius: 28px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.30);
+  }
+  .staff-panel h2 {
+    margin-bottom: 18px;
+    font-size: 20px;
+  }
+  .staff-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .stat-card {
+    padding: 18px;
+    background: #111e35;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.10);
+  }
+  .stat-card h3 {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #94a3b8;
+  }
+  .stat-card p {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .staff-form-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .staff-form-row .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .staff-panel .form-field input,
+  .staff-panel .form-field select,
+  .staff-panel .form-field textarea,
+  .staff-form-row .form-field input,
+  .staff-form-row .form-field select,
+  .staff-form-row .form-field textarea,
+  .menu-search-bar input,
+  .menu-search-bar select {
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 12px 14px;
+    background: #0f172a;
+    color: #e2e8f0;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .staff-form-row .form-field select,
+  .menu-search-bar select,
+  .staff-panel .form-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  .staff-form-row .form-field textarea,
+  .staff-panel .form-field textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.00) 50%);
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  }
+  .menu-search-bar select option {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .tag-pill {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid rgba(203, 213, 225, 0.08);
+  }
+  .menu-item-row,
+  .order-row,
+  .announcement-row,
+  .note-row {
+    margin-bottom: 16px;
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.10);
+    background: rgba(15, 23, 42, 0.92);
+  }
+  .menu-item-row .menu-row-top,
+  .order-row .order-row-top {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .order-row .order-row-top > div {
+    min-width: 0;
+  }
+  .order-row .card-actions {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .menu-item-row h4,
+  .order-row h4,
+  .announcement-row h4,
+  .note-row h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
+  .menu-item-row p,
+  .order-row p,
+  .announcement-row p,
+  .note-row p {
+    margin: 0;
+    color: #cbd5e1;
+    font-size: 14px;
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .status-pending { background: rgba(251, 191, 36, 0.16); color: #f59e0b; }
+  .status-preparing { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+  .status-ready { background: rgba(16, 185, 129, 0.14); color: #34d399; }
+  .status-paid { background: rgba(16, 185, 129, 0.12); color: #86efac; }
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    justify-content: flex-start;
+  }
+  .card-actions button {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.2s ease;
+    min-width: 120px;
+  }
+  .card-actions button:hover { transform: translateY(-1px); }
+  .btn-outline {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+  }
+  .btn-success {
+    background: #14b8a6;
+    color: #ffffff;
+  }
+  .btn-alert {
+    background: #ef4444;
+    color: #ffffff;
+  }
+  .btn-secondary {
+    background: #2563eb;
+    color: #ffffff;
+  }
+  .staff-footer-note {
+    margin-top: 16px;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+  .menu-search-bar {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .menu-search-bar input,
+  .menu-search-bar select {
+    flex: 1;
+    min-width: 180px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .field-grid small {
+    color: #94a3b8;
+  }
+  .notice-card {
+    background: rgba(34, 45, 63, 0.9);
+    border: 1px dashed rgba(148, 163, 184, 0.15);
+    padding: 18px;
+    border-radius: 20px;
+    color: #cbd5e1;
+  }
+  @media (max-width: 900px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    .staff-form-row {
+      grid-template-columns: 1fr;
+    }
+    .menu-search-bar {
+      flex-direction: column;
+    }
+    .menu-search-bar input,
+    .menu-search-bar select {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+  @media (max-width: 650px) {
+    .card-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .card-actions button {
+      width: 100%;
+    }
   }
 </style>
 </head>
 <body>
-<h1>Staff Management System (Backend Mode)</h1>
+<header class="header-wrapper">
+  <div class="container header-container">
+    <div class="brand">
+      <div class="logo-circle">R</div>
+      <div class="brand-text">
+        <h1>Rozza Express</h1>
+        <p>Staff Portal</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="nav-tab-btn" onclick="window.location.href='index.html'">Student View</button>
+      <button class="nav-tab-btn btn-alert" id="logout-button" onclick="logoutStaff()" style="display:none;">Logout</button>
+    </div>
+  </div>
+</header>
+<main class="container staff-page-wrapper">
+  <div class="staff-login-screen" id="staff-login-screen">
+    <div class="staff-login-card">
+      <h2>Staff Sign In</h2>
+      <p>Only tuckshop staff can access the staff portal. Enter your staff credentials to view orders, manage stock, and publish announcements.</p>
+      <div class="login-field">
+        <label for="staff-username">Staff Username</label>
+        <input id="staff-username" type="text" placeholder="e.g. mrs.bennett" autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label for="staff-password">Password</label>
+        <input id="staff-password" type="password" placeholder="Enter staff password">
+      </div>
+      <button class="btn-red btn-login" onclick="handleStaffLogin()">Sign In</button>
+      <p class="staff-footer-note">Password is required to unlock the staff portal. This page only shows after successful sign in.</p>
+    </div>
+  </div>
 
-<div id="login-section">
-  <h2>Login</h2>
-  <input type="text" id="login-username" placeholder="Username" />
-  <input type="password" id="login-password" placeholder="Password" />
-  <button id="login-btn">Login</button>
-</div>
-
-<div id="system" style="display:none;">
-  <h2>Welcome, Staff!</h2>
-  <button id="logout-btn">Logout</button>
-
-  <section>
-    <h3>Manage Menu Items</h3>
-    <input type="text" id="menu-item-name" placeholder="Item Name" />
-    <input type="number" id="menu-item-price" placeholder="Price" step="0.01" />
-    <button id="add-menu-item">Add Item</button>
-    <ul id="menu-list"></ul>
+  <section class="dashboard-grid">
+    <div class="staff-panel">
+      <h2>Live Canteen Control</h2>
+      <div class="staff-card-grid">
+        <div class="stat-card">
+          <h3>Today’s Revenue</h3>
+          <p id="today-revenue">$0.00</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Orders</h3>
+          <p id="active-orders-count">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Stock Alerts</h3>
+          <p id="stock-alert-count">0 low items</p>
+        </div>
+        <div class="stat-card">
+          <h3>Shift Notes</h3>
+          <p id="shift-notes-count">0 pinned</p>
+        </div>
+      </div>
+    </div>
+    <div class="staff-panel">
+      <h2>Food Safety & Traceability</h2>
+      <div class="notice-card">
+        <p><strong>Temperature checks:</strong> Oven and cooler logs tracked for every batch.</p>
+        <p><strong>Traceability:</strong> Item batches are linked to supplier receipts and allergen labels.</p>
+        <p><strong>Standards:</strong> Allergen cards, handling notes, and hygiene sign-off visible to staff.</p>
+      </div>
+      <div class="staff-panel" style="margin-top: 20px; padding: 18px; background: rgba(30,41,59,0.92);">
+        <h2>Announcements</h2>
+        <div class="form-field">
+          <label for="announcement-input">Publish message</label>
+          <textarea id="announcement-input" placeholder="Enter announcement for staff and volunteers"></textarea>
+        </div>
+        <div class="card-actions" style="margin-top: 12px; justify-content:flex-start;">
+          <button class="btn-secondary" onclick="addAnnouncement()">Post Announcement</button>
+        </div>
+      </div>
+      <div id="announcement-list" style="margin-top: 18px;"></div>
+    </div>
   </section>
 
-  <section>
-    <h3>Orders</h3>
-    <button id="simulate-order">Simulate New Order</button>
-    <ul id="orders-list"></ul>
+  <section class="dashboard-grid">
+    <div class="staff-panel">
+      <h2>Menu & Stock Management</h2>
+      <div class="staff-form-row">
+        <div class="form-field">
+          <label for="item-name">Item name</label>
+          <input id="item-name" type="text" placeholder="e.g. Classic Cheeseburger">
+        </div>
+        <div class="form-field">
+          <label for="item-price">Price</label>
+          <input id="item-price" type="number" step="0.05" placeholder="4.50">
+        </div>
+        <div class="form-field">
+          <label for="item-stock">Stock qty</label>
+          <input id="item-stock" type="number" placeholder="12">
+        </div>
+      </div>
+      <div class="staff-form-row">
+        <div class="form-field">
+          <label for="item-category">Category</label>
+          <select id="item-category">
+            <option value="Hot Meals">Hot Meals</option>
+            <option value="Sandwiches">Sandwiches</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Treats">Treats</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Dietary flags</label>
+          <div class="tag-list" id="diet-tag-list"></div>
+        </div>
+        <div class="form-field" style="align-self:flex-end;">
+          <button class="btn-red" onclick="upsertMenuItem()" id="add-menu-btn">Add menu item</button>
+        </div>
+      </div>
+      <div class="menu-search-bar">
+        <input id="menu-search" type="text" placeholder="Search menu items" oninput="renderMenuTable()">
+        <select id="menu-filter" onchange="renderMenuTable()">
+          <option value="All">All categories</option>
+          <option value="Hot Meals">Hot Meals</option>
+          <option value="Sandwiches">Sandwiches</option>
+          <option value="Drinks">Drinks</option>
+          <option value="Snacks">Snacks</option>
+          <option value="Treats">Treats</option>
+        </select>
+      </div>
+      <div id="menu-item-list"></div>
+    </div>
+    <div class="staff-panel">
+      <h2>Orders Pipeline</h2>
+      <div class="card-actions" style="justify-content: flex-start; margin-bottom: 18px;">
+        <button class="btn-secondary" onclick="simulateNewOrder()">Simulate Order</button>
+      </div>
+      <div id="orders-pipeline"></div>
+    </div>
   </section>
 
-  <section>
-    <h3>Stock Management</h3>
-    <button id="restock-stock">Restock Stock</button>
-    <ul id="stock-list"></ul>
+  <section class="dashboard-grid">
+    <div class="staff-panel">
+      <h2>Shift Handover Notes</h2>
+      <div id="note-list"></div>
+      <div class="staff-form-row" style="margin-top: 18px;">
+        <div class="form-field">
+          <label for="note-author">Your name</label>
+          <input id="note-author" type="text" placeholder="e.g. Sarah Chen">
+        </div>
+        <div class="form-field">
+          <label for="note-message">Bulletin message</label>
+          <textarea id="note-message" placeholder="e.g. Check salad prep stock before afternoon rush"></textarea>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn-secondary" onclick="addShiftNote()">Pin Handover Note</button>
+      </div>
+    </div>
+    <div class="staff-panel">
+      <h2>Daily Sales & Dietary Flags</h2>
+      <div class="stat-card" style="margin-bottom: 16px;">
+        <h3>Revenue today</h3>
+        <p id="daily-sales">$0.00</p>
+      </div>
+      <div class="stat-card" style="margin-bottom: 16px;">
+        <h3>Order breakdown</h3>
+        <p id="order-breakdown">pending 0 · preparing 0 · ready 0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Dietary coverage</h3>
+        <p id="dietary-summary">0 vegetarian · 0 gluten-free · 0 dairy-free</p>
+      </div>
+    </div>
   </section>
-
-  <section>
-    <h3>Profit & Analytics</h3>
-    <div>Total Profit: $<span id="profit">0.00</span></div>
-  </section>
-
-  <section>
-    <h3>Notes & Announcements</h3>
-    <textarea id="notes-area" rows="4" cols="50" readonly></textarea><br/>
-    <input type="text" id="new-note" placeholder="Add Note" />
-    <button id="add-note">Add Note</button>
-  </section>
-
-  <section>
-    <h3>Logs</h3>
-    <div id="log"></div>
-  </section>
-</div>
-
+</main>
 <script>
-  // Authentication logic
-  const loginBtn = document.getElementById('login-btn');
-  const loginSection = document.getElementById('login-section');
-  const systemDiv = document.getElementById('system');
-  const logoutBtn = document.getElementById('logout-btn');
+const STAFF_PASSWORD = 'staff202';
+const dietaryTags = ['Vegetarian','Gluten-Free','Dairy-Free','Nut-Free','Vegan'];
+const staffState = {
+  menuItems: [
+    { id: 1, name: 'Classic Cheeseburger', price: 8.50, stock: 18, category: 'Hot Meals', tags: [], status: 'online' },
+    { id: 2, name: 'Chicken Tenders & Fries', price: 9.00, stock: 12, category: 'Hot Meals', tags: ['Nut-Free'], status: 'online' },
+    { id: 3, name: 'Sparkling Water', price: 3.00, stock: 24, category: 'Drinks', tags: ['Vegan','Gluten-Free','Dairy-Free'], status: 'online' },
+    { id: 4, name: 'Warm Cheese Scone', price: 4.00, stock: 6, category: 'Treats', tags: ['Vegetarian'], status: 'online' }
+  ],
+  orders: [
+    { id: 101, customer: 'Student 22419', item: 'Classic Cheeseburger', price: 8.50, status: 'pending', timestamp: '11:32 AM', paid: false },
+    { id: 102, customer: 'Prof. J. Thorne', item: 'Warm Cheese Scone', price: 4.00, status: 'preparing', timestamp: '11:45 AM', paid: true },
+    { id: 103, customer: 'Dr. M. Vance', item: 'Sparkling Water', price: 3.00, status: 'ready', timestamp: '11:55 AM', paid: true }
+  ],
+  notes: [
+    { author: 'Sarah Chen', message: 'Deep clean coffee machine after the morning rush.', time: '08:45 AM' },
+    { author: 'David Wilson', message: 'Milk cooler set to safe 3°C and tagged.', time: '09:04 AM' }
+  ],
+  announcements: [
+    { message: 'Faculty discount active today: 15% off all lunch orders.', time: '08:00 AM' }
+  ],
+  editMode: false,
+  editItemId: null
+};
 
-  loginBtn.onclick = () => {
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value.trim();
-    if (password === 'staff202') {
-      loginSection.style.display = 'none';
-      systemDiv.style.display = 'block';
-      log(`User ${username} logged in.`);
+function $(id) {
+  return document.getElementById(id);
+}
+
+function handleStaffLogin() {
+  const username = $('staff-username').value.trim();
+  const password = $('staff-password').value.trim();
+  if (password === STAFF_PASSWORD && username.length > 0) {
+    sessionStorage.setItem('staffLoggedIn', 'true');
+    $('staff-login-screen').style.display = 'none';
+    $('logout-button').style.display = 'inline-flex';
+    renderStaffDashboard();
+  } else {
+    alert('Access denied. Please enter valid staff credentials.');
+  }
+}
+
+function logoutStaff() {
+  sessionStorage.removeItem('staffLoggedIn');
+  $('staff-login-screen').style.display = 'flex';
+  $('logout-button').style.display = 'none';
+  $('staff-username').value = '';
+  $('staff-password').value = '';
+}
+
+function renderStaffDashboard() {
+  renderDietTags();
+  renderMenuTable();
+  renderOrdersPipeline();
+  renderShiftNotes();
+  renderAnnouncements();
+  updateSummaryCards();
+}
+
+function renderDietTags() {
+  const container = $('diet-tag-list');
+  container.innerHTML = '';
+  dietaryTags.forEach(tag => {
+    const pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'tag-pill btn-outline';
+    pill.textContent = tag;
+    pill.dataset.active = 'false';
+    pill.onclick = () => toggleDietTag(pill, tag);
+    container.appendChild(pill);
+  });
+}
+
+function toggleDietTag(button, tag) {
+  button.classList.toggle('btn-success');
+  button.classList.toggle('btn-outline');
+  button.dataset.active = button.dataset.active === 'true' ? 'false' : 'true';
+}
+
+function upsertMenuItem() {
+  const name = $('item-name').value.trim();
+  const price = parseFloat($('item-price').value);
+  const stock = parseInt($('item-stock').value, 10) || 0;
+  const category = $('item-category').value;
+  const tags = Array.from($('diet-tag-list').children).filter(btn => btn.dataset.active === 'true').map(btn => btn.textContent);
+
+  if (!name || isNaN(price) || price <= 0) {
+    return alert('Enter a valid name and price.');
+  }
+  if (staffState.editMode && staffState.editItemId !== null) {
+    const item = staffState.menuItems.find(item => item.id === staffState.editItemId);
+    if (item) {
+      item.name = name;
+      item.price = price;
+      item.stock = stock;
+      item.category = category;
+      item.tags = tags;
+    }
+    staffState.editMode = false;
+    staffState.editItemId = null;
+    $('add-menu-btn').textContent = 'Add menu item';
+  } else {
+    const newId = Math.max(0, ...staffState.menuItems.map(item => item.id)) + 1;
+    staffState.menuItems.unshift({ id: newId, name, price, stock, category, tags, status: 'online' });
+  }
+  $('item-name').value = '';
+  $('item-price').value = '';
+  $('item-stock').value = '';
+  $('menu-filter').value = 'All';
+  Array.from($('diet-tag-list').children).forEach(btn => {
+    btn.dataset.active = 'false';
+    btn.classList.remove('btn-success');
+    btn.classList.add('btn-outline');
+  });
+  renderMenuTable();
+  updateSummaryCards();
+}
+
+function renderMenuTable() {
+  const search = $('menu-search').value.toLowerCase();
+  const filter = $('menu-filter').value;
+  const container = $('menu-item-list');
+  container.innerHTML = '';
+  const visibleItems = staffState.menuItems.filter(item => {
+    const termMatch = item.name.toLowerCase().includes(search) || item.category.toLowerCase().includes(search);
+    const categoryMatch = filter === 'All' || item.category === filter;
+    return termMatch && categoryMatch;
+  });
+  visibleItems.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'menu-item-row';
+    row.innerHTML = `
+      <div class="menu-row-top">
+        <div>
+          <h4>${item.name}</h4>
+          <p>${item.category} · $${item.price.toFixed(2)} · ${item.stock} left</p>
+        </div>
+        <div>
+          <span class="status-badge ${item.stock === 0 ? 'status-pending' : 'status-ready'}">${item.stock === 0 ? 'Out of stock' : 'In stock'}</span>
+        </div>
+      </div>
+      <div class="tag-list">${item.tags.map(tag => `<span class="tag-pill">${tag}</span>`).join('')}</div>
+      <div class="card-actions">
+        <button class="btn-secondary" onclick="editMenuItem(${item.id})">Edit</button>
+        <button class="btn-alert" onclick="deleteMenuItem(${item.id})">Remove</button>
+        <button class="btn-outline" onclick="restockItem(${item.id})">Restock +10</button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function editMenuItem(itemId) {
+  const item = staffState.menuItems.find(item => item.id === itemId);
+  if (!item) return;
+  $('item-name').value = item.name;
+  $('item-price').value = item.price;
+  $('item-stock').value = item.stock;
+  $('item-category').value = item.category;
+  staffState.editMode = true;
+  staffState.editItemId = item.id;
+  $('add-menu-btn').textContent = 'Save changes';
+  Array.from($('diet-tag-list').children).forEach(btn => {
+    if (item.tags.includes(btn.textContent)) {
+      btn.dataset.active = 'true';
+      btn.classList.add('btn-success');
+      btn.classList.remove('btn-outline');
     } else {
-      alert('Incorrect password.');
+      btn.dataset.active = 'false';
+      btn.classList.remove('btn-success');
+      btn.classList.add('btn-outline');
     }
-  };
+  });
+}
 
-  logoutBtn.onclick = () => {
-    document.getElementById('login-username').value = '';
-    document.getElementById('login-password').value = '';
-    loginSection.style.display = 'block';
-    systemDiv.style.display = 'none';
-    log('User logged out.');
-  };
+function deleteMenuItem(itemId) {
+  staffState.menuItems = staffState.menuItems.filter(item => item.id !== itemId);
+  renderMenuTable();
+  updateSummaryCards();
+}
 
-  // Data storage
-  let menuItems = [];
-  let orders = [];
-  let stock = {};
-  let totalProfit = 0;
-  let notes = [];
+function restockItem(itemId) {
+  const item = staffState.menuItems.find(item => item.id === itemId);
+  if (!item) return;
+  item.stock += 10;
+  renderMenuTable();
+  updateSummaryCards();
+}
 
-  // Utility log function
-  function log(message) {
-    const logDiv = document.getElementById('log');
-    logDiv.innerHTML += message + '<br/>';
-    logDiv.scrollTop = logDiv.scrollHeight;
+function simulateNewOrder() {
+  const availableItems = staffState.menuItems.filter(item => item.stock > 0);
+  if (!availableItems.length) {
+    return alert('No available stock to simulate an order.');
   }
+  const menuItem = availableItems[Math.floor(Math.random() * availableItems.length)];
+  const orderId = Math.max(100, ...staffState.orders.map(order => order.id)) + 1;
+  staffState.orders.unshift({ id: orderId, customer: 'Student ' + Math.floor(22000 + Math.random() * 999), item: menuItem.name, price: menuItem.price, status: 'pending', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), paid: false });
+  menuItem.stock = Math.max(0, menuItem.stock - 1);
+  renderOrdersPipeline();
+  renderMenuTable();
+  updateSummaryCards();
+}
 
-  // Manage menu items
- document.getElementById('add-menu-item').onclick = () => {
-    const name = document.getElementById('menu-item-name').value.trim();
-    const price = parseFloat(document.getElementById('menu-item-price').value);
-    if (name && !isNaN(price)) {
-      menuItems.push({ name, price });
-      updateMenuList();
-      log(`Added menu item: ${name} at $${price.toFixed(2)}`);
-      document.getElementById('menu-item-name').value = '';
-      document.getElementById('menu-item-price').value = '';
-    } else {
-      alert('Enter valid item name and price.');
-    }
-  };
+function renderOrdersPipeline() {
+  const container = $('orders-pipeline');
+  container.innerHTML = '';
+  staffState.orders.forEach(order => {
+    const row = document.createElement('div');
+    row.className = 'order-row';
+    row.innerHTML = `
+      <div class="order-row-top">
+        <div>
+          <h4>Order #${order.id} · ${order.customer}</h4>
+          <p>${order.item} · $${order.price.toFixed(2)}</p>
+        </div>
+        <div>
+          <span class="status-badge status-${order.status}">${order.status}</span>
+        </div>
+      </div>
+      <div class="field-grid">
+        <div><small>Time</small><p>${order.timestamp}</p></div>
+        <div><small>Paid</small><p>${order.paid ? 'Yes' : 'No'}</p></div>
+      </div>
+      <div class="card-actions">
+        ${order.status !== 'ready' ? `<button class="btn-secondary" onclick="updateOrderStatus(${order.id}, '${nextStatus(order.status)}')">Move to ${nextStatus(order.status)}</button>` : ''}
+        ${order.paid ? '' : `<button class="btn-success" onclick="collectPayment(${order.id})">Collect Payment</button>`}
+        <button class="btn-outline" onclick="cancelOrder(${order.id})">Cancel</button>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
 
-  function updateMenuList() {
-    const list = document.getElementById('menu-list');
-    list.innerHTML = '';
-    menuItems.forEach((item, index) => {
-      list.innerHTML += `<li>${item.name} - $${item.price.toFixed(2)}</li>`;
-    });
+function nextStatus(current) {
+  return current === 'pending' ? 'preparing' : 'ready';
+}
+
+function updateOrderStatus(orderId, status) {
+  const order = staffState.orders.find(order => order.id === orderId);
+  if (!order) return;
+  order.status = status;
+  renderOrdersPipeline();
+  updateSummaryCards();
+}
+
+function collectPayment(orderId) {
+  const order = staffState.orders.find(order => order.id === orderId);
+  if (!order) return;
+  order.paid = true;
+  renderOrdersPipeline();
+  updateSummaryCards();
+}
+
+function cancelOrder(orderId) {
+  staffState.orders = staffState.orders.filter(order => order.id !== orderId);
+  renderOrdersPipeline();
+  updateSummaryCards();
+}
+
+function addShiftNote() {
+  const author = $('note-author').value.trim() || 'Staff';
+  const message = $('note-message').value.trim();
+  if (!message) return alert('Enter a note before pinning it.');
+  staffState.notes.unshift({ author, message, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  $('note-author').value = '';
+  $('note-message').value = '';
+  renderShiftNotes();
+  updateSummaryCards();
+}
+
+function renderShiftNotes() {
+  const container = $('note-list');
+  container.innerHTML = '';
+  staffState.notes.forEach(note => {
+    const noteCard = document.createElement('div');
+    noteCard.className = 'note-row';
+    noteCard.innerHTML = `
+      <div class="menu-row-top">
+        <div><h4>${note.author}</h4><p>${note.message}</p></div>
+        <div><small>${note.time}</small></div>
+      </div>
+    `;
+    container.appendChild(noteCard);
+  });
+  $('shift-notes-count').textContent = `${staffState.notes.length} pinned`;
+}
+
+function addAnnouncement() {
+  const message = $('announcement-input').value.trim();
+  if (!message) return alert('Enter an announcement to publish.');
+  staffState.announcements.unshift({ message, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+  $('announcement-input').value = '';
+  renderAnnouncements();
+}
+
+function renderAnnouncements() {
+  const listContainer = $('announcement-list');
+  listContainer.innerHTML = staffState.announcements.map(item => `
+    <div class="announcement-row"><h4>${item.time}</h4><p>${item.message}</p></div>
+  `).join('');
+}
+
+function updateSummaryCards() {
+  const todayTotal = staffState.orders.reduce((sum, order) => sum + (order.paid ? order.price : 0), 0);
+  const activeOrders = staffState.orders.filter(order => order.status !== 'ready').length;
+  const stockLow = staffState.menuItems.filter(item => item.stock > 0 && item.stock <= 5).length;
+  const pending = staffState.orders.filter(order => order.status === 'pending').length;
+  const preparing = staffState.orders.filter(order => order.status === 'preparing').length;
+  const ready = staffState.orders.filter(order => order.status === 'ready').length;
+  const vegetarian = staffState.menuItems.filter(item => item.tags.includes('Vegetarian')).length;
+  const glutenFree = staffState.menuItems.filter(item => item.tags.includes('Gluten-Free')).length;
+  const dairyFree = staffState.menuItems.filter(item => item.tags.includes('Dairy-Free')).length;
+
+  $('today-revenue').textContent = `$${todayTotal.toFixed(2)}`;
+  $('daily-sales').textContent = `$${todayTotal.toFixed(2)}`;
+  $('active-orders-count').textContent = activeOrders;
+  $('stock-alert-count').textContent = `${stockLow} low items`;
+  $('order-breakdown').textContent = `pending ${pending} · preparing ${preparing} · ready ${ready}`;
+  $('dietary-summary').textContent = `${vegetarian} vegetarian · ${glutenFree} gluten-free · ${dairyFree} dairy-free`;
+}
+
+function initializePortal() {
+  if (sessionStorage.getItem('staffLoggedIn') === 'true') {
+    $('staff-login-screen').style.display = 'none';
+    $('logout-button').style.display = 'inline-flex';
+    renderStaffDashboard();
   }
+}
 
-  // Simulate orders
- document.getElementById('simulate-order').onclick = () => {
-    if (menuItems.length === 0) {
-      alert('No menu items to order.');
-      return;
-    }
-    const item = menuItems[Math.floor(Math.random() * menuItems.length)];
-    const orderId = orders.length + 1;
-    const order = {
-      id: orderId,
-      item: item.name,
-      price: item.price,
-      timestamp: new Date()
-    };
-    orders.push(order);
-    updateOrders();
-    totalProfit += item.price;
-    document.getElementById('profit').innerText = totalProfit.toFixed(2);
-    log(`Order #${order.id}: ${item.name} at $${item.price.toFixed(2)}`);
-  };
-
-  function updateOrders() {
-    const list = document.getElementById('orders-list');
-    list.innerHTML = '';
-    orders.forEach(order => {
-      list.innerHTML += `<li>Order #${order.id}: ${order.item} - $${order.price.toFixed(2)} (${order.timestamp.toLocaleString()})</li>`;
-    });
-  }
-
-  // Restock stock
- document.getElementById('restock-stock').onclick = () => {
-    if (menuItems.length === 0) {
-      alert('Add menu items first.');
-      return;
-    }
-    menuItems.forEach(item => {
-      stock[item.name] = (stock[item.name] || 0) + 10; // Add 10 units
-    });
-    updateStock();
-    log('Stock restocked with 10 units for all items.');
-  };
-
-  function updateStock() {
-    const list = document.getElementById('stock-list');
-    list.innerHTML = '';
-    for (const item in stock) {
-      list.innerHTML += `<li>${item}: ${stock[item]} units</li>`;
-    }
-  }
-
-  // Add notes
- document.getElementById('add-note').onclick = () => {
-    const noteText = document.getElementById('new-note').value.trim();
-    if (noteText) {
-      notes.push({ text: noteText, timestamp: new Date() });
-      updateNotes();
-      document.getElementById('new-note').value = '';
-      log(`Note added: ${noteText}`);
-    }
-  };
-
-  function updateNotes() {
-    const textarea = document.getElementById('notes-area');
-    textarea.value = '';
-    notes.forEach(note => {
-      textarea.value += `[${note.timestamp.toLocaleString()}] ${note.text}\n`;
-    });
-  }
-
-  // Initialize display
-  updateMenuList();
-  updateOrders();
-  updateStock();
-  updateNotes();
-
+initializePortal();
 </script>
 </body>
 </html>
