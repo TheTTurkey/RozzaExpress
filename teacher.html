@@ -191,7 +191,13 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    align-items: flex-start;
+    align-items: center;
+  }
+  .order-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+    padding: 20px 18px;
   }
   .order-row .order-row-top > div {
     min-width: 0;
@@ -199,6 +205,24 @@
   .order-row .card-actions {
     justify-content: flex-start;
     gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .order-row .card-actions::-webkit-scrollbar {
+    height: 6px;
+  }
+  .order-row .card-actions::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 999px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: 24px;
+    align-items: start;
+  }
+  .field-grid div {
+    min-width: 0;
   }
   .menu-item-row h4,
   .order-row h4,
@@ -232,10 +256,12 @@
   .status-paid { background: rgba(16, 185, 129, 0.12); color: #86efac; }
   .card-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 10px;
     margin-top: 12px;
     justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .card-actions button {
     padding: 10px 16px;
@@ -244,7 +270,10 @@
     cursor: pointer;
     font-weight: 700;
     transition: transform 0.2s ease;
-    min-width: 120px;
+    min-width: auto;
+    font-family: inherit;
+    font-size: 0.95rem;
+    white-space: nowrap;
   }
   .card-actions button:hover { transform: translateY(-1px); }
   .btn-outline {
