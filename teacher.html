@@ -598,8 +598,11 @@
           <button class="sub" style="background:transparent;color:#e11d48;font-size:11px;font-weight:700;padding:0;cursor:pointer;margin-top:2px" onclick="switchView('inventory')">Access Stock Catalog →</button>
         </div>
         <div class="stat-card">
-          <label>Shift Officers</label>
-          <div class="val" style="font-size:15px;color:#0f172a">Marcus, Sarah, David</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label>Shift Officers</label>
+            <button id="edit-shift-btn" onclick="editShiftOfficers()" style="background:transparent; color:#e11d48; font-size:10px; font-weight:800; cursor:pointer;">✎ Edit</button>
+          </div>
+          <div class="val" id="shift-officers-display" style="font-size:15px;color:#0f172a">Marcus, Sarah, David</div>
           <div class="sub warn" style="font-size:10px">Role: Lunch Shift Active</div>
         </div>
       </div>
@@ -643,7 +646,7 @@
     <div class="view" id="view-inventory">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
-          <h1 style="font-size:22px;font-weight:900;color:#f1f5f9">Active Canteen Catalog</h1>
+          <h1 style="font-size:22px;font-weight:900;color:#0f172a">Active Canteen Catalog</h1>
           <p style="font-size:11px;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-top:4px">Control pricing, toggle visibility, and update stocking quantities</p>
         </div>
         <button class="btn-add-item" onclick="openAddModal()">＋ Add New Item</button>
@@ -677,7 +680,7 @@
 
     <!-- ─────────── FACULTY ORDERING VIEW ─────────── -->
     <div class="view" id="view-ordering">
-      <h1 style="font-size:22px;font-weight:900;color:#f1f5f9;margin-bottom:4px">Faculty Lounge Delivery</h1>
+      <h1 style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">Faculty Lounge Delivery</h1>
       <p style="font-size:11px;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:20px">Express refreshments checkout with inter-departmental billing systems</p>
       <div id="ordering-err" class="validation-err"></div>
 
@@ -742,8 +745,15 @@
 
     <!-- ─────────── HANDOVER VIEW ─────────── -->
     <div class="view" id="view-handover">
-      <h1 style="font-size:22px;font-weight:900;color:#f1f5f9;margin-bottom:4px">Command Analytics & Shift Handover</h1>
-      <p style="font-size:11px;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin-bottom:24px">Campus sales performance charts and shift bulletin board</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h1 style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">Command Analytics & Shift Handover</h1>
+          <p style="font-size:11px;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;color:#475569">Campus sales performance charts and shift bulletin board</p>
+        </div>
+        <button class="btn-secondary" style="font-size:12px; padding:10px 18px; border-radius:12px; display:flex; align-items:center; gap:6px;" onclick="exportSalesToCSV()">
+          📥 Export Sales to Excel
+        </button>
+      </div>
 
       <!-- Charts + Metrics -->
       <div class="analytics-grid">
@@ -956,6 +966,75 @@
 </div>
 
 <script>
+let isEditingShift = false;
+
+function editShiftOfficers() {
+  const display = document.getElementById('shift-officers-display');
+  const editBtn = document.getElementById('edit-shift-btn');
+  
+  if (!isEditingShift) {
+    isEditingShift = true;
+    const current = display.textContent;
+    display.innerHTML = `<input type="text" id="shift-officers-input" style="background:#ffffff; border:1px solid #cbd5e1; color:#0f172a; border-radius:6px; padding:3px 6px; font-size:12px; width:100%; font-weight:700;" value="${current}">`;
+    editBtn.textContent = '💾 Save';
+    document.getElementById('shift-officers-input').focus();
+    document.getElementById('shift-officers-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        editShiftOfficers();
+      }
+    });
+  } else {
+    isEditingShift = false;
+    const input = document.getElementById('shift-officers-input');
+    const val = input.value.trim() || 'Marcus, Sarah, David';
+    localStorage.setItem('rozza_express_shift_officers', val);
+    display.innerHTML = val;
+    editBtn.textContent = '✎ Edit';
+    renderDashboard();
+  }
+}
+
+function exportSalesToCSV() {
+  const localOrders = JSON.parse(localStorage.getItem('rozza_express_orders')) || [];
+  if (localOrders.length === 0) {
+    alert('No sales data available to export.');
+    return;
+  }
+
+  // Create CSV headers
+  const headers = ['Order ID', 'User ID', 'User Type', 'Items Ordered', 'Pickup/Delivery Time', 'Location', 'Status', 'Total ($)', 'Billing Code', 'Special Instructions'];
+  
+  // Format rows
+  const rows = localOrders.map(order => {
+    const itemsStr = order.items.map(item => `${item.qty}x ${item.name}`).join('; ');
+    return [
+      order.id || '',
+      order.userId || '',
+      order.userType || '',
+      `"${itemsStr.replace(/"/g, '""')}"`,
+      order.pickupTime || '',
+      order.pickupLocation || '',
+      order.status || '',
+      (order.total || 0).toFixed(2),
+      order.billingCode || 'N/A',
+      `"${(order.deliveryProtocol || '').replace(/"/g, '""')}"`
+    ];
+  });
+
+  // Combine headers and rows
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  
+  // Create download link
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `rozza_express_sales_${new Date().toISOString().slice(0, 10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // ══════════════════════════════
 //  STATE
 // ══════════════════════════════
@@ -1353,6 +1432,11 @@ function renderDashboard() {
     menuItems = JSON.parse(localStorage.getItem('rozza_express_menu')) || [];
   } catch (e) {
     console.error(e);
+  }
+  if (!isEditingShift) {
+    const shiftOfficers = localStorage.getItem('rozza_express_shift_officers') || 'Marcus, Sarah, David';
+    const displayEl = document.getElementById('shift-officers-display');
+    if (displayEl) displayEl.textContent = shiftOfficers;
   }
   const low = menuItems.filter(m => m.isActive && m.stock <= 5);
   document.getElementById('stat-revenue').textContent = '$' + calcRevenue().toFixed(2);
