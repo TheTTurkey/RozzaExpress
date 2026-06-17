@@ -973,8 +973,6 @@
 // ══════════════════════════════
 //  STATE
 // ══════════════════════════════
-const STAFF_PASSWORD = 'staff202';
-
 const IMAGES = {
   'Hot Meals': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400',
   'Sandwiches': 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&q=80&w=400',
@@ -983,34 +981,321 @@ const IMAGES = {
   'Treats': 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=400',
 };
 
-let menuItems = [
-  { id:'m1', name:'Classic Cheeseburger', price:8.50, stock:15, maxStock:25, category:'Hot Meals', allergens:['Halal'], isActive:true, image:'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=400', description:'Flame-grilled beef patty, melted cheddar, pickles, mustard.' },
-  { id:'m2', name:'Chicken Tenders & Fries', price:9.00, stock:12, maxStock:30, category:'Hot Meals', allergens:['Halal'], isActive:true, image:'https://images.unsplash.com/photo-1562967914-6c41b1293341?auto=format&fit=crop&q=80&w=400', description:'Buttermilk chicken tenders, golden fries, garlic aioli.' },
-  { id:'m3', name:'Sparkling Water', price:3.00, stock:24, maxStock:40, category:'Drinks', allergens:['Vegetarian','Gluten-Free','Dairy-Free'], isActive:true, image:'https://images.unsplash.com/photo-1536935338788-846bb9981813?auto=format&fit=crop&q=80&w=400', description:'Chilled sparkling water 330ml.' },
-  { id:'m4', name:'Warm Cheese Scone', price:4.00, stock:6, maxStock:15, category:'Treats', allergens:['Vegetarian'], isActive:true, image:'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=400', description:'Oven-warm cheese and herb scone.' },
-  { id:'m5', name:'Garden Fresh Salad Bowl', price:6.00, stock:14, maxStock:20, category:'Sandwiches', allergens:['Vegetarian','Gluten-Free','Dairy-Free'], isActive:true, image:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400', description:'Cherry tomatoes, grapes, cucumbers, carrots, vinaigrette.' },
-  { id:'m6', name:'Flat White', price:5.00, stock:30, maxStock:50, category:'Drinks', allergens:['Vegetarian'], isActive:true, image:'https://images.unsplash.com/photo-1611564494260-6f21b80af7ea?auto=format&fit=crop&q=80&w=400', description:'Double shot espresso with steamed milk.' },
-  { id:'m7', name:'Pepperoni Pizza Slice', price:4.50, stock:5, maxStock:20, category:'Hot Meals', allergens:[], isActive:true, image:'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&q=80&w=400', description:'Classic New York slice, mozzarella, pepperoni.' },
-  { id:'m8', name:'Chocolate Brownie', price:3.50, stock:18, maxStock:24, category:'Treats', allergens:['Vegetarian'], isActive:true, image:'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=400', description:'Fudgy dark chocolate brownie, dusted with cocoa.' },
+const DEFAULT_MENU_ITEMS = [
+  {
+    id: 'classic-cheeseburger',
+    name: 'Classic Cheeseburger',
+    category: 'Burgers',
+    staffCategory: 'Hot Meals',
+    description: 'Beef patty, cheese, lettuce, tomato, pickles',
+    price: 4.50,
+    points: 90,
+    tag: 'Popular',
+    dietary: [],
+    allergens: ['Halal'],
+    stock: 5,
+    maxStock: 25,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'smash-burger',
+    name: 'Smash Burger',
+    category: 'Burgers',
+    staffCategory: 'Hot Meals',
+    description: 'Double smash patty, special sauce, brioche bun',
+    price: 5.50,
+    points: 220,
+    tag: '2x PTS',
+    dietary: [],
+    allergens: [],
+    stock: 8,
+    maxStock: 30,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'loaded-cheeseburger',
+    name: 'Loaded Cheeseburger',
+    category: 'Burgers',
+    staffCategory: 'Hot Meals',
+    description: 'Triple stack, bacon, cheese, BBQ sauce',
+    price: 6.00,
+    points: 120,
+    tag: '',
+    dietary: [],
+    allergens: [],
+    stock: 3,
+    maxStock: 20,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'chicken-tenders-fries',
+    name: 'Chicken Tenders & Fries',
+    category: 'Snacks',
+    staffCategory: 'Hot Meals',
+    description: 'Buttermilk chicken tenders, golden fries, garlic aioli.',
+    price: 9.00,
+    points: 180,
+    tag: '',
+    dietary: [],
+    allergens: ['Halal'],
+    stock: 12,
+    maxStock: 30,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1562967914-6c41b1293341?auto=format&fit=crop&w=400'
+  },
+  {
+    id: 'pepperoni-pizza-slice',
+    name: 'Pepperoni Pizza Slice',
+    category: 'Snacks',
+    staffCategory: 'Hot Meals',
+    description: 'Classic New York slice, mozzarella, pepperoni.',
+    price: 4.50,
+    points: 90,
+    tag: '',
+    dietary: [],
+    allergens: [],
+    stock: 5,
+    maxStock: 20,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=400'
+  },
+  {
+    id: 'sausage-roll',
+    name: 'Sausage Roll',
+    category: 'Pies & Rolls',
+    staffCategory: 'Snacks',
+    description: 'Flaky pastry, seasoned pork mince',
+    price: 2.50,
+    points: 50,
+    tag: 'Popular',
+    dietary: [],
+    allergens: [],
+    stock: 2,
+    maxStock: 15,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'mince-cheese-pie',
+    name: 'Mince & Cheese Pie',
+    category: 'Pies & Rolls',
+    staffCategory: 'Hot Meals',
+    description: 'Classic Kiwi beef mince & cheese',
+    price: 3.00,
+    points: 60,
+    tag: '',
+    dietary: [],
+    allergens: [],
+    stock: 4,
+    maxStock: 15,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'chicken-mushroom-pie',
+    name: 'Chicken & Mushroom Pie',
+    category: 'Pies & Rolls',
+    staffCategory: 'Hot Meals',
+    description: 'Creamy chicken and mushroom filling',
+    price: 3.50,
+    points: 70,
+    tag: '',
+    dietary: [],
+    allergens: [],
+    stock: 1,
+    maxStock: 15,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1628294895520-22e9602e1c07?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'juicy-juice',
+    name: 'Juicy Juice',
+    category: 'Drinks',
+    staffCategory: 'Drinks',
+    description: 'Cold pressed fruit juice, 250ml',
+    price: 2.00,
+    points: 80,
+    tag: '2x PTS',
+    dietary: ['V', 'GF', 'DF'],
+    allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+    stock: 15,
+    maxStock: 30,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'sparkling-water',
+    name: 'Sparkling Water',
+    category: 'Drinks',
+    staffCategory: 'Drinks',
+    description: 'Chilled sparkling water, 330ml',
+    price: 1.50,
+    points: 30,
+    tag: '',
+    dietary: ['V', 'GF', 'DF'],
+    allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+    stock: 20,
+    maxStock: 40,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'flat-white',
+    name: 'Flat White',
+    category: 'Drinks',
+    staffCategory: 'Drinks',
+    description: 'Double shot espresso with steamed milk.',
+    price: 5.00,
+    points: 100,
+    tag: '',
+    dietary: ['V'],
+    allergens: ['Vegetarian'],
+    stock: 30,
+    maxStock: 50,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1611564494260-6f21b80af7ea?auto=format&fit=crop&w=400'
+  },
+  {
+    id: 'garden-fresh-salad-bowl',
+    name: 'Garden Fresh Salad Bowl',
+    category: 'Snacks',
+    staffCategory: 'Sandwiches',
+    description: 'Cherry tomatoes, grapes, cucumbers, carrots, vinaigrette.',
+    price: 6.00,
+    points: 120,
+    tag: '',
+    dietary: ['V', 'GF', 'DF'],
+    allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+    stock: 14,
+    maxStock: 20,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'chip-packet',
+    name: 'Chip Packet',
+    category: 'Snacks',
+    staffCategory: 'Snacks',
+    description: 'BBQ or salt & vinegar, 40g',
+    price: 1.50,
+    points: 30,
+    tag: '',
+    dietary: ['V', 'GF', 'DF'],
+    allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+    stock: 12,
+    maxStock: 25,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1566478989037-eec170784d20?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'loaded-fries',
+    name: 'Loaded Fries',
+    category: 'Snacks',
+    staffCategory: 'Snacks',
+    description: 'Crispy fries, cheese sauce, seasoning',
+    price: 3.50,
+    points: 70,
+    tag: 'Popular',
+    dietary: ['V'],
+    allergens: ['Vegetarian'],
+    stock: 6,
+    maxStock: 15,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80'
+  },
+  {
+    id: 'warm-cheese-scone',
+    name: 'Warm Cheese Scone',
+    category: 'Snacks',
+    staffCategory: 'Treats',
+    description: 'Oven-warm cheese and herb scone.',
+    price: 4.00,
+    points: 80,
+    tag: '',
+    dietary: ['V'],
+    allergens: ['Vegetarian'],
+    stock: 6,
+    maxStock: 15,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400'
+  },
+  {
+    id: 'chocolate-brownie',
+    name: 'Chocolate Brownie',
+    category: 'Snacks',
+    staffCategory: 'Treats',
+    description: 'Fudgy dark chocolate brownie, dusted with cocoa.',
+    price: 3.50,
+    points: 70,
+    tag: '',
+    dietary: ['V'],
+    allergens: ['Vegetarian'],
+    stock: 18,
+    maxStock: 24,
+    isActive: true,
+    image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400'
+  }
 ];
 
-let orders = [
-  { id:'RZ-88201-FT', userId:'Prof. J. Thorne', userType:'faculty', items:[{name:'Flat White',qty:2},{name:'Garden Fresh Salad Bowl',qty:1}], pickupTime:'11:45 AM', pickupLocation:'Faculty Lounge Express', status:'pending', total:13.25, billingCode:'HUM-2026', deliveryProtocol:'Nut Allergy pack. Hand directly at door.' },
+let menuItems = [];
+if (localStorage.getItem('rozza_express_menu')) {
+  try {
+    menuItems = JSON.parse(localStorage.getItem('rozza_express_menu'));
+  } catch (e) {
+    console.error("Failed to parse cached menu, using defaults.", e);
+    menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+  }
+} else {
+  menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+  localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
+}
+
+const DEFAULT_ORDERS = [
+  { id:'RZ-88201-FT', userId:'Prof. J. Thorne', userType:'faculty', items:[{name:'Flat White',qty:2},{name:'Garden Fresh Salad Bowl',qty:1}], pickupTime:'11:45 AM', pickupLocation:'Faculty Lounge Delivery', status:'pending', total:13.25, billingCode:'HUM-2026', deliveryProtocol:'Nut Allergy pack. Hand directly at door.' },
   { id:'RZ-88215-ST', userId:'109844', userType:'student', items:[{name:'Classic Cheeseburger',qty:1},{name:'Chicken Tenders & Fries',qty:1}], pickupTime:'12:30 PM', pickupLocation:'School Canteen – Window 3', status:'pending', total:12.20 },
   { id:'RZ-88102-FT', userId:'Dean S. Jenkins', userType:'faculty', items:[{name:'Garden Fresh Salad Bowl',qty:1},{name:'Sparkling Water',qty:1}], pickupTime:'12:10 PM', pickupLocation:'Staff Lounge Express', status:'preparing', total:10.28, billingCode:'ADM-001', deliveryProtocol:'Deliver hot on platter.' },
   { id:'RZ-88099-FT', userId:'Dr. M. Vance', userType:'faculty', items:[{name:'Flat White',qty:2}], pickupTime:'11:55 AM', pickupLocation:'Faculty Lounge Delivery', status:'ready', total:6.45, billingCode:'MATH-400', deliveryProtocol:'Extra hot.' },
 ];
+
+let orders = [];
+if (localStorage.getItem('rozza_express_orders')) {
+  try {
+    orders = JSON.parse(localStorage.getItem('rozza_express_orders'));
+  } catch (e) {
+    console.error(e);
+    orders = JSON.parse(JSON.stringify(DEFAULT_ORDERS));
+  }
+} else {
+  orders = JSON.parse(JSON.stringify(DEFAULT_ORDERS));
+  localStorage.setItem('rozza_express_orders', JSON.stringify(orders));
+}
 
 let facCart = [];
 let selectedSwatch = 'yellow';
 let fulfillmentType = 'delivery';
 let invCategory = 'All';
 
-let handoverNotes = [
-  { id:'n1', author:'Marcus Jensen', category:'urgent', text:'Canteen Window 3 heater is slightly finicky today. Keep an eye on the butter chicken temp gauge.', color:'red', time: now() },
-  { id:'n2', author:'Sarah Chen', category:'supply', text:'Low on chocolate syrup for milkshakes. Express delivery from depot expected by tomorrow.', color:'yellow', time: now() },
-  { id:'n3', author:'David Wilson', category:'cleaning', text:'Full deep clean on Faculty espresso machine completed. Water softener filters replaced.', color:'green', time: now() },
+const DEFAULT_NOTES = [
+  { id:'n1', author:'Marcus Jensen', category:'urgent', text:'Canteen Window 3 heater is slightly finicky today. Keep an eye on the butter chicken temp gauge.', color:'red', time: '11:30 AM' },
+  { id:'n2', author:'Sarah Chen', category:'supply', text:'Low on chocolate syrup for milkshakes. Express delivery from depot expected by tomorrow.', color:'yellow', time: '10:15 AM' },
+  { id:'n3', author:'David Wilson', category:'cleaning', text:'Full deep clean on Faculty espresso machine completed. Water softener filters replaced.', color:'green', time: '09:00 AM' },
 ];
+
+let handoverNotes = [];
+if (localStorage.getItem('rozza_express_notes')) {
+  try {
+    handoverNotes = JSON.parse(localStorage.getItem('rozza_express_notes'));
+  } catch (e) {
+    console.error(e);
+    handoverNotes = JSON.parse(JSON.stringify(DEFAULT_NOTES));
+  }
+} else {
+  handoverNotes = JSON.parse(JSON.stringify(DEFAULT_NOTES));
+  localStorage.setItem('rozza_express_notes', JSON.stringify(handoverNotes));
+}
 
 function now() {
   const d = new Date();
@@ -1021,11 +1306,12 @@ function now() {
 //  AUTH
 // ══════════════════════════════
 function doLogin() {
-  const user = document.getElementById('staff-user').value.trim();
+  const user = document.getElementById('staff-user').value.trim().toLowerCase();
   const pass = document.getElementById('staff-pass').value.trim();
   const errEl = document.getElementById('login-err');
   if (!user) { showLoginErr('Please enter your staff username.'); return; }
-  if (pass !== STAFF_PASSWORD) { showLoginErr('Access denied. Incorrect staff password.'); return; }
+  if (user !== 'mr john') { showLoginErr('Access denied. Incorrect staff username.'); return; }
+  if (pass !== 'pass2026') { showLoginErr('Access denied. Incorrect staff password.'); return; }
   sessionStorage.setItem('staffAuth','1');
   document.getElementById('login-overlay').style.display = 'none';
   document.getElementById('logout-btn').style.display = '';
@@ -1076,6 +1362,12 @@ function initDashboard() {
 //  DASHBOARD
 // ══════════════════════════════
 function renderDashboard() {
+  try {
+    orders = JSON.parse(localStorage.getItem('rozza_express_orders')) || [];
+    menuItems = JSON.parse(localStorage.getItem('rozza_express_menu')) || [];
+  } catch (e) {
+    console.error(e);
+  }
   const low = menuItems.filter(m => m.isActive && m.stock <= 5);
   document.getElementById('stat-revenue').textContent = '$' + calcRevenue().toFixed(2);
   document.getElementById('stat-stock-warn').textContent = low.length === 0
@@ -1134,11 +1426,16 @@ function renderCol(elId, list, status) {
 
 function updateOrder(id, status) {
   const o = orders.find(o => o.id === id);
-  if (o) { o.status = status; renderDashboard(); }
+  if (o) {
+    o.status = status;
+    localStorage.setItem('rozza_express_orders', JSON.stringify(orders));
+    renderDashboard();
+  }
 }
 
 function cancelOrder(id) {
   orders = orders.filter(o => o.id !== id);
+  localStorage.setItem('rozza_express_orders', JSON.stringify(orders));
   renderDashboard();
 }
 
@@ -1149,6 +1446,8 @@ function simulateOrder() {
   const id = 'RZ-' + (Math.floor(1000 + Math.random()*9000)) + '-ST';
   orders.unshift({ id, userId: String(Math.floor(10000 + Math.random()*99999)), userType:'student', items:[{name:item.name,qty:1}], pickupTime: now(), pickupLocation:'School Canteen – Window ' + (1 + Math.floor(Math.random()*3)), status:'pending', total: item.price });
   item.stock = Math.max(0, item.stock - 1);
+  localStorage.setItem('rozza_express_orders', JSON.stringify(orders));
+  localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
   renderDashboard();
 }
 
@@ -1169,9 +1468,14 @@ function setCat(cat) {
 }
 
 function renderInventory() {
+  try {
+    menuItems = JSON.parse(localStorage.getItem('rozza_express_menu')) || [];
+  } catch (e) {
+    console.error(e);
+  }
   const q = (document.getElementById('inv-search')?.value||'').toLowerCase();
   const filtered = menuItems.filter(m => {
-    const matchCat = invCategory === 'All' || m.category === invCategory;
+    const matchCat = invCategory === 'All' || m.staffCategory === invCategory;
     const matchQ = m.name.toLowerCase().includes(q) || m.description.toLowerCase().includes(q);
     return matchCat && matchQ;
   });
@@ -1198,7 +1502,7 @@ function renderInventory() {
 
     return `<tr>
       <td><div class="item-info"><img class="item-thumb" src="${m.image}" alt="${m.name}"><div class="item-info-text"><p>${m.name}</p><small>${m.description.slice(0,50)}…</small></div></div></td>
-      <td class="center"><span class="cat-badge">${m.category}</span></td>
+      <td class="center"><span class="cat-badge">${m.staffCategory}</span></td>
       <td class="center"><input type="number" class="price-input" step="0.1" min="0" value="${m.price.toFixed(2)}" onchange="updatePrice('${m.id}',this.value)"></td>
       <td><div class="stock-bar"><div class="stock-bar-label"><span>${m.stock} / ${m.maxStock} units</span><span>${pct}%</span></div><div class="progress-bar-bg"><div style="height:100%;background:${barColor};border-radius:99px;width:${pct}%"></div></div><div class="stock-adjusters"><button class="btn-adj" onclick="adjStock('${m.id}',-5)">-5 units</button><button class="btn-adj" onclick="adjStock('${m.id}',5)">+5 units</button></div></div></td>
       <td class="center"><div class="allergen-tags">${allergens}</div></td>
@@ -1209,17 +1513,30 @@ function renderInventory() {
 
 function toggleItem(id) {
   const m = menuItems.find(m => m.id === id);
-  if (m) { m.isActive = !m.isActive; renderInventory(); renderDashboard(); }
+  if (m) {
+    m.isActive = !m.isActive;
+    localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
+    renderInventory();
+    renderDashboard();
+  }
 }
 
 function updatePrice(id, val) {
   const m = menuItems.find(m => m.id === id);
-  if (m) { m.price = Math.max(0, parseFloat(val)||0); }
+  if (m) {
+    m.price = Math.max(0, parseFloat(val)||0);
+    localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
+  }
 }
 
 function adjStock(id, amt) {
   const m = menuItems.find(m => m.id === id);
-  if (m) { m.stock = Math.max(0, Math.min(m.maxStock, m.stock + amt)); renderInventory(); renderDashboard(); }
+  if (m) {
+    m.stock = Math.max(0, Math.min(m.maxStock, m.stock + amt));
+    localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
+    renderInventory();
+    renderDashboard();
+  }
 }
 
 // Add Item Modal
@@ -1248,12 +1565,31 @@ function submitNewItem() {
   if (!name || isNaN(price) || price < 0) { errEl.textContent='⚠️ Enter a valid name and price.'; errEl.style.display='block'; return; }
   if (stock < 0 || maxStock < stock) { errEl.textContent='⚠️ Stock must be ≥ 0 and ≤ max stock.'; errEl.style.display='block'; return; }
 
+  const studentCatMap = {
+    'Hot Meals': 'Burgers',
+    'Sandwiches': 'Snacks',
+    'Drinks': 'Drinks',
+    'Snacks': 'Snacks',
+    'Treats': 'Snacks'
+  };
+  const studentCat = studentCatMap[cat] || 'Snacks';
+
   menuItems.unshift({
-    id: 'c-' + Date.now(), name, price, stock, maxStock, category: cat,
+    id: 'c-' + Date.now(),
+    name,
+    price,
+    stock,
+    maxStock,
+    category: studentCat,
+    staffCategory: cat,
     description: desc || name + ' – Freshly prepared by Rosmini Canteen chefs today.',
     image: IMAGES[cat] || IMAGES['Hot Meals'],
-    allergens, isActive: true
+    allergens,
+    dietary: allergens.map(a => a === 'Vegetarian' ? 'V' : a === 'Gluten-Free' ? 'GF' : a === 'Dairy-Free' ? 'DF' : '').filter(Boolean),
+    isActive: true
   });
+
+  localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
 
   document.getElementById('new-name').value=''; document.getElementById('new-price').value='';
   document.getElementById('new-desc').value=''; document.getElementById('new-stock').value='20'; document.getElementById('new-max').value='30';
@@ -1266,7 +1602,12 @@ function submitNewItem() {
 //  FACULTY ORDERING
 // ══════════════════════════════
 function renderOrdering() {
-  const favs = menuItems.filter(m => m.isActive && (m.category === 'Drinks' || m.category === 'Treats'));
+  try {
+    menuItems = JSON.parse(localStorage.getItem('rozza_express_menu')) || [];
+  } catch (e) {
+    console.error(e);
+  }
+  const favs = menuItems.filter(m => m.isActive && (m.staffCategory === 'Drinks' || m.staffCategory === 'Treats'));
   const el = document.getElementById('office-favs');
   el.innerHTML = favs.map(m => `<div class="fav-card"><img src="${m.image}" alt="${m.name}"><div class="fav-card-info"><p>${m.name}</p><span>$${m.price.toFixed(2)}</span></div><button class="btn-add-fav" onclick="addToFacCart('${m.id}')">+ ADD</button></div>`).join('') || '<p style="color:#475569;font-size:12px">No favourites available</p>';
   updateFacCart();
@@ -1471,6 +1812,16 @@ function processPayment() {
       const { facId, dept, grand, proto } = pendingOrderData;
       const id = 'RZ-' + (1000 + Math.floor(Math.random()*9000)) + '-FT';
       const loc = fulfillmentType === 'delivery' ? 'Faculty Lounge Delivery' : 'Staff Lounge Express';
+      
+      // Deduct stock levels in menu items
+      facCart.forEach(item => {
+        const menuItem = menuItems.find(m => m.id === item.id);
+        if (menuItem) {
+          menuItem.stock = Math.max(0, menuItem.stock - item.qty);
+        }
+      });
+      localStorage.setItem('rozza_express_menu', JSON.stringify(menuItems));
+
       orders.unshift({
         id, userId: facId, userType:'faculty',
         items: facCart.map(i => ({name:i.name, qty:i.qty})),
@@ -1478,6 +1829,7 @@ function processPayment() {
         pickupLocation: loc, status:'pending', total: grand,
         billingCode: dept, deliveryProtocol: proto
       });
+      localStorage.setItem('rozza_express_orders', JSON.stringify(orders));
 
       // Show success
       const last4 = num.slice(-4);
@@ -1522,16 +1874,23 @@ function addNote() {
   if (!author || !text) { errEl.textContent = '⚠️ Please fill in your name and a message.'; errEl.style.display = 'block'; return; }
   errEl.style.display = 'none';
   handoverNotes.unshift({ id: 'n-' + Date.now(), author, category: document.getElementById('note-cat').value, text, color: selectedSwatch, time: now() });
+  localStorage.setItem('rozza_express_notes', JSON.stringify(handoverNotes));
   document.getElementById('note-author').value = ''; document.getElementById('note-text').value = '';
   renderHandover();
 }
 
 function deleteNote(id) {
   handoverNotes = handoverNotes.filter(n => n.id !== id);
+  localStorage.setItem('rozza_express_notes', JSON.stringify(handoverNotes));
   renderHandover();
 }
 
 function renderHandover() {
+  try {
+    handoverNotes = JSON.parse(localStorage.getItem('rozza_express_notes')) || [];
+  } catch (e) {
+    console.error(e);
+  }
   const el = document.getElementById('corkboard');
   document.getElementById('note-count-badge').textContent = handoverNotes.length + ' memos';
 
@@ -1558,6 +1917,22 @@ function renderHandover() {
 //  INIT
 // ══════════════════════════════
 document.addEventListener('DOMContentLoaded', checkAuth);
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'rozza_express_orders' || e.key === 'rozza_express_menu') {
+    const dashboardActive = document.getElementById('view-dashboard').classList.contains('active');
+    const inventoryActive = document.getElementById('view-inventory').classList.contains('active');
+    const orderingActive = document.getElementById('view-ordering').classList.contains('active');
+    
+    if (dashboardActive) renderDashboard();
+    if (inventoryActive) renderInventory();
+    if (orderingActive) renderOrdering();
+  } else if (e.key === 'rozza_express_notes') {
+    if (document.getElementById('view-handover').classList.contains('active')) {
+      renderHandover();
+    }
+  }
+});
 </script>
 </body>
 </html>

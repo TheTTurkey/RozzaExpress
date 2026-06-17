@@ -628,7 +628,7 @@
 
       <div class="login-form-group">
         <label for="outside-restaurant">Select Restaurant Partner</label>
-        <select id="outside-restaurant" class="select-modal" onchange="calculateOutsideTotal()">
+        <select id="outside-restaurant" class="select-modal" onchange="populateOutsideFoodItems()">
           <option value="McDonald's">McDonald's</option>
           <option value="KFC">KFC</option>
           <option value="Subway">Subway</option>
@@ -637,13 +637,15 @@
       </div>
 
       <div class="login-form-group">
-        <label for="outside-food-name">What food items do you want?</label>
-        <input type="text" id="outside-food-name" class="input-modal" placeholder="e.g. McChicken Meal, 10pc Nuggets" required>
+        <label for="outside-food-select">Select Food Item</label>
+        <select id="outside-food-select" class="select-modal" onchange="updateOutsidePrice()">
+          <!-- Populated dynamically -->
+        </select>
       </div>
 
       <div class="login-form-group">
         <label for="outside-food-cost">Food Cost ($)</label>
-        <input type="number" id="outside-food-cost" class="input-modal" placeholder="0.00" min="1" step="0.01" oninput="calculateOutsideTotal()" required>
+        <input type="number" id="outside-food-cost" class="input-modal" placeholder="0.00" min="1" step="0.01" readonly required>
       </div>
 
       <!-- Fees list -->
@@ -742,129 +744,278 @@
       localStorage.setItem('rozza_express_state', JSON.stringify(state));
     }
 
-    // Food Menu Items data (added dietary tags and initial stock)
-    const menuItemsData = [
+    // Food Menu Items default catalog (unified for both portals)
+    const DEFAULT_MENU_ITEMS = [
       {
         id: 'classic-cheeseburger',
         name: 'Classic Cheeseburger',
         category: 'Burgers',
+        staffCategory: 'Hot Meals',
         description: 'Beef patty, cheese, lettuce, tomato, pickles',
         price: 4.50,
         points: 90,
         tag: 'Popular',
         dietary: [],
+        allergens: ['Halal'],
         stock: 5,
+        maxStock: 25,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'smash-burger',
         name: 'Smash Burger',
         category: 'Burgers',
+        staffCategory: 'Hot Meals',
         description: 'Double smash patty, special sauce, brioche bun',
         price: 5.50,
         points: 220,
         tag: '2x PTS',
         dietary: [],
+        allergens: [],
         stock: 8,
+        maxStock: 30,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'loaded-cheeseburger',
         name: 'Loaded Cheeseburger',
         category: 'Burgers',
+        staffCategory: 'Hot Meals',
         description: 'Triple stack, bacon, cheese, BBQ sauce',
         price: 6.00,
         points: 120,
         tag: '',
         dietary: [],
+        allergens: [],
         stock: 3,
+        maxStock: 20,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'chicken-tenders-fries',
+        name: 'Chicken Tenders & Fries',
+        category: 'Snacks',
+        staffCategory: 'Hot Meals',
+        description: 'Buttermilk chicken tenders, golden fries, garlic aioli.',
+        price: 9.00,
+        points: 180,
+        tag: '',
+        dietary: [],
+        allergens: ['Halal'],
+        stock: 12,
+        maxStock: 30,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1562967914-6c41b1293341?auto=format&fit=crop&w=400'
+      },
+      {
+        id: 'pepperoni-pizza-slice',
+        name: 'Pepperoni Pizza Slice',
+        category: 'Snacks',
+        staffCategory: 'Hot Meals',
+        description: 'Classic New York slice, mozzarella, pepperoni.',
+        price: 4.50,
+        points: 90,
+        tag: '',
+        dietary: [],
+        allergens: [],
+        stock: 5,
+        maxStock: 20,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=400'
       },
       {
         id: 'sausage-roll',
         name: 'Sausage Roll',
         category: 'Pies & Rolls',
+        staffCategory: 'Snacks',
         description: 'Flaky pastry, seasoned pork mince',
         price: 2.50,
         points: 50,
         tag: 'Popular',
         dietary: [],
+        allergens: [],
         stock: 2,
+        maxStock: 15,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1601050690597-df056fb4ce78?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'mince-cheese-pie',
         name: 'Mince & Cheese Pie',
         category: 'Pies & Rolls',
+        staffCategory: 'Hot Meals',
         description: 'Classic Kiwi beef mince & cheese',
         price: 3.00,
         points: 60,
         tag: '',
         dietary: [],
+        allergens: [],
         stock: 4,
+        maxStock: 15,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1519869325930-281384150729?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'chicken-mushroom-pie',
         name: 'Chicken & Mushroom Pie',
         category: 'Pies & Rolls',
+        staffCategory: 'Hot Meals',
         description: 'Creamy chicken and mushroom filling',
         price: 3.50,
         points: 70,
         tag: '',
         dietary: [],
+        allergens: [],
         stock: 1,
+        maxStock: 15,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1628294895520-22e9602e1c07?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'juicy-juice',
         name: 'Juicy Juice',
         category: 'Drinks',
+        staffCategory: 'Drinks',
         description: 'Cold pressed fruit juice, 250ml',
         price: 2.00,
         points: 80,
         tag: '2x PTS',
         dietary: ['V', 'GF', 'DF'],
+        allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
         stock: 15,
+        maxStock: 30,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'sparkling-water',
         name: 'Sparkling Water',
         category: 'Drinks',
+        staffCategory: 'Drinks',
         description: 'Chilled sparkling water, 330ml',
         price: 1.50,
         points: 30,
         tag: '',
         dietary: ['V', 'GF', 'DF'],
+        allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
         stock: 20,
+        maxStock: 40,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'flat-white',
+        name: 'Flat White',
+        category: 'Drinks',
+        staffCategory: 'Drinks',
+        description: 'Double shot espresso with steamed milk.',
+        price: 5.00,
+        points: 100,
+        tag: '',
+        dietary: ['V'],
+        allergens: ['Vegetarian'],
+        stock: 30,
+        maxStock: 50,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1611564494260-6f21b80af7ea?auto=format&fit=crop&w=400'
+      },
+      {
+        id: 'garden-fresh-salad-bowl',
+        name: 'Garden Fresh Salad Bowl',
+        category: 'Snacks',
+        staffCategory: 'Sandwiches',
+        description: 'Cherry tomatoes, grapes, cucumbers, carrots, vinaigrette.',
+        price: 6.00,
+        points: 120,
+        tag: '',
+        dietary: ['V', 'GF', 'DF'],
+        allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
+        stock: 14,
+        maxStock: 20,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'chip-packet',
         name: 'Chip Packet',
         category: 'Snacks',
+        staffCategory: 'Snacks',
         description: 'BBQ or salt & vinegar, 40g',
         price: 1.50,
         points: 30,
         tag: '',
         dietary: ['V', 'GF', 'DF'],
+        allergens: ['Vegetarian', 'Gluten-Free', 'Dairy-Free'],
         stock: 12,
+        maxStock: 25,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1566478989037-eec170784d20?auto=format&fit=crop&w=500&q=80'
       },
       {
         id: 'loaded-fries',
         name: 'Loaded Fries',
         category: 'Snacks',
+        staffCategory: 'Snacks',
         description: 'Crispy fries, cheese sauce, seasoning',
         price: 3.50,
         points: 70,
         tag: 'Popular',
         dietary: ['V'],
+        allergens: ['Vegetarian'],
         stock: 6,
+        maxStock: 15,
+        isActive: true,
         image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=500&q=80'
+      },
+      {
+        id: 'warm-cheese-scone',
+        name: 'Warm Cheese Scone',
+        category: 'Snacks',
+        staffCategory: 'Treats',
+        description: 'Oven-warm cheese and herb scone.',
+        price: 4.00,
+        points: 80,
+        tag: '',
+        dietary: ['V'],
+        allergens: ['Vegetarian'],
+        stock: 6,
+        maxStock: 15,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=400'
+      },
+      {
+        id: 'chocolate-brownie',
+        name: 'Chocolate Brownie',
+        category: 'Snacks',
+        staffCategory: 'Treats',
+        description: 'Fudgy dark chocolate brownie, dusted with cocoa.',
+        price: 3.50,
+        points: 70,
+        tag: '',
+        dietary: ['V'],
+        allergens: ['Vegetarian'],
+        stock: 18,
+        maxStock: 24,
+        isActive: true,
+        image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400'
       }
     ];
+
+    let menuItemsData = [];
+    if (localStorage.getItem('rozza_express_menu')) {
+      try {
+        menuItemsData = JSON.parse(localStorage.getItem('rozza_express_menu'));
+      } catch (e) {
+        console.error("Failed to parse cached menu, using defaults.", e);
+        menuItemsData = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+      }
+    } else {
+      menuItemsData = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+      localStorage.setItem('rozza_express_menu', JSON.stringify(menuItemsData));
+    }
 
     // Today's Deals data
     const dealsData = [
@@ -1002,6 +1153,20 @@
       checkLoginState();
     });
 
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'rozza_express_orders' || e.key === 'rozza_express_menu') {
+        try {
+          menuItemsData = JSON.parse(localStorage.getItem('rozza_express_menu')) || [];
+        } catch (err) {
+          console.error(err);
+        }
+        renderRecentOrders();
+        applyDietaryFilter();
+        updatePointsDisplays();
+        updateCartUI();
+      }
+    });
+
     // Tab Switching
     function switchTab(tabName) {
       // Toggle button states
@@ -1133,14 +1298,35 @@
       if (!container) return;
 
       container.innerHTML = '';
+      
+      let sharedOrders = [];
+      try {
+        sharedOrders = JSON.parse(localStorage.getItem('rozza_express_orders')) || [];
+      } catch (e) {
+        console.error(e);
+      }
+
       state.recentOrders.forEach(order => {
         let orderTypeBadge = '';
         let timerWidget = '';
 
+        // Find status in shared kitchen queue
+        const sharedOrder = sharedOrders.find(o => o.id === order.id);
+        const currentStatus = sharedOrder ? sharedOrder.status : 'completed';
+
         if (order.type === 'partner') {
-          orderTypeBadge = `<span class="order-status-badge badge-grey">Partner Food</span>`;
+          if (currentStatus === 'pending') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#f59e0b;color:#fff;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;">Pending Delivery</span>`;
+          } else if (currentStatus === 'preparing') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#38bdf8;color:#0f172a;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;">En Route</span>`;
+          } else if (currentStatus === 'ready') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#10b981;color:#fff;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;">Arrived at Counter</span>`;
+          } else {
+            orderTypeBadge = `<span class="order-status-badge badge-grey">Partner Food</span>`;
+          }
+          
           // If active timer
-          if (order.countdown && order.countdown > 0) {
+          if (order.countdown && order.countdown > 0 && currentStatus !== 'ready' && currentStatus !== 'completed') {
             timerWidget = `
               <div class="delivery-countdown-bar" id="timer-box-${order.id}">
                 <div class="delivery-countdown-left">
@@ -1152,7 +1338,15 @@
             `;
           }
         } else {
-          orderTypeBadge = `<span class="order-status-badge status-delivered">Delivered</span>`;
+          if (currentStatus === 'pending') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#f59e0b;color:#fff;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;">Pending</span>`;
+          } else if (currentStatus === 'preparing') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#38bdf8;color:#0f172a;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;">Preparing</span>`;
+          } else if (currentStatus === 'ready') {
+            orderTypeBadge = `<span class="order-status-badge" style="background:#10b981;color:#fff;border-radius:12px;padding:3px 8px;font-size:11px;font-weight:700;animation:pulse 1.5s infinite;">Ready for Pickup!</span>`;
+          } else {
+            orderTypeBadge = `<span class="order-status-badge status-delivered">Delivered</span>`;
+          }
         }
 
         container.innerHTML += `
@@ -1626,6 +1820,46 @@
       }
     }
 
+    // Shared Orders helpers
+    function getSharedOrders() {
+      if (!localStorage.getItem('rozza_express_orders')) {
+        const defaultOrders = [
+          { id:'RZ-88201-FT', userId:'Prof. J. Thorne', userType:'faculty', items:[{name:'Flat White',qty:2},{name:'Garden Fresh Salad Bowl',qty:1}], pickupTime:'11:45 AM', pickupLocation:'Faculty Lounge Delivery', status:'pending', total:13.25, billingCode:'HUM-2026', deliveryProtocol:'Nut Allergy pack. Hand directly at door.' },
+          { id:'RZ-88215-ST', userId:'109844', userType:'student', items:[{name:'Classic Cheeseburger',qty:1},{name:'Chicken Tenders & Fries',qty:1}], pickupTime:'12:30 PM', pickupLocation:'School Canteen – Window 3', status:'pending', total:12.20 },
+          { id:'RZ-88102-FT', userId:'Dean S. Jenkins', userType:'faculty', items:[{name:'Garden Fresh Salad Bowl',qty:1},{name:'Sparkling Water',qty:1}], pickupTime:'12:10 PM', pickupLocation:'Staff Lounge Express', status:'preparing', total:10.28, billingCode:'ADM-001', deliveryProtocol:'Deliver hot on platter.' },
+          { id:'RZ-88099-FT', userId:'Dr. M. Vance', userType:'faculty', items:[{name:'Flat White',qty:2}], pickupTime:'11:55 AM', pickupLocation:'Faculty Lounge Delivery', status:'ready', total:6.45, billingCode:'MATH-400', deliveryProtocol:'Extra hot.' },
+        ];
+        localStorage.setItem('rozza_express_orders', JSON.stringify(defaultOrders));
+        return defaultOrders;
+      }
+      try {
+        return JSON.parse(localStorage.getItem('rozza_express_orders')) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function pushSharedOrder(orderId, items, total, type) {
+      const sharedOrders = getSharedOrders();
+      const windowNum = 1 + Math.floor(Math.random() * 3);
+      const isPartner = type === 'partner';
+      const loc = isPartner ? 'Outside Food Pickup Counter' : (state.deliveryMode === 'delivery' ? 'School Canteen – Window 3' : `School Canteen – Window ${windowNum}`);
+      
+      const newOrder = {
+        id: orderId,
+        userId: state.userName || 'Student',
+        userType: 'student',
+        items: items,
+        pickupTime: state.deliveryMode === 'delivery' ? '12:30 PM' : 'Interval',
+        pickupLocation: loc,
+        status: 'pending',
+        total: total
+      };
+      
+      sharedOrders.unshift(newOrder);
+      localStorage.setItem('rozza_express_orders', JSON.stringify(sharedOrders));
+    }
+
     // Checkout Flow
     function checkoutCart() {
       if (state.cart.length === 0) {
@@ -1666,6 +1900,7 @@
           menuItem.stock -= item.quantity;
         }
       });
+      localStorage.setItem('rozza_express_menu', JSON.stringify(menuItemsData));
 
       // Points calculation
       let pointsEst = state.cart.reduce((sum, item) => sum + (item.points * item.quantity), 0);
@@ -1690,6 +1925,9 @@
       if (itemsListStr.length > 32) {
         itemsListStr = state.cart.map(c => c.name).slice(0, 2).join(', ') + '...';
       }
+
+      // Push order to shared kitchen queue
+      pushSharedOrder(orderId, state.cart.map(c => ({ name: c.name, qty: c.quantity })), totalCost, 'standard');
 
       // Insert at the beginning of Recent Orders list
       state.recentOrders.unshift({
@@ -1792,8 +2030,54 @@
     // -------------------------------------------------------------
     // OUTSIDE FOOD PARTNER ORDER LOGIC
     // -------------------------------------------------------------
-    function openOutsideOrderModal() {
+    const PARTNER_MENUS = {
+      "McDonald's": [
+        { name: "Big Mac Meal", price: 12.50 },
+        { name: "10pc Chicken McNuggets Meal", price: 11.00 },
+        { name: "Cheeseburger Combo", price: 7.50 },
+        { name: "McSpicy Meal", price: 13.00 }
+      ],
+      "KFC": [
+        { name: "3pc Hot & Spicy Combo", price: 14.00 },
+        { name: "Zinger Burger Meal", price: 12.50 },
+        { name: "Wicked Wings Combo (6pc)", price: 11.50 },
+        { name: "Popcorn Chicken Bucket", price: 9.00 }
+      ],
+      "Subway": [
+        { name: "Footlong Subway Club", price: 16.00 },
+        { name: "Footlong Meatball Marinara", price: 14.50 },
+        { name: "Six-Inch Chicken Teriyaki", price: 9.50 },
+        { name: "Subway Cookie (3 Pack)", price: 5.00 }
+      ],
+      "Pizza Hut": [
+        { name: "Personal Pepperoni Pizza", price: 8.00 },
+        { name: "Personal Cheese Pizza", price: 7.50 },
+        { name: "Personal Meat Lovers Pizza", price: 9.00 },
+        { name: "Personal Hawaiian Pizza", price: 8.50 }
+      ]
+    };
+
+    function populateOutsideFoodItems() {
+      const restaurant = document.getElementById('outside-restaurant').value;
+      const selectEl = document.getElementById('outside-food-select');
+      const items = PARTNER_MENUS[restaurant] || [];
+      
+      selectEl.innerHTML = items.map(item => `<option value="${item.name}" data-price="${item.price}">${item.name} - $${item.price.toFixed(2)}</option>`).join('');
+      updateOutsidePrice();
+    }
+
+    function updateOutsidePrice() {
+      const selectEl = document.getElementById('outside-food-select');
+      const selectedOption = selectEl.options[selectEl.selectedIndex];
+      if (selectedOption) {
+        const price = parseFloat(selectedOption.dataset.price) || 0;
+        document.getElementById('outside-food-cost').value = price.toFixed(2);
+      }
       calculateOutsideTotal();
+    }
+
+    function openOutsideOrderModal() {
+      populateOutsideFoodItems();
       document.getElementById('outside-order-modal').classList.add('open');
     }
 
@@ -1822,7 +2106,7 @@
 
     function submitOutsideFoodOrder() {
       const restaurant = document.getElementById('outside-restaurant').value;
-      const foodName = document.getElementById('outside-food-name').value.trim();
+      const foodName = document.getElementById('outside-food-select').value;
       const costInput = document.getElementById('outside-food-cost').value;
       const costVal = parseFloat(costInput) || 0;
 
@@ -1869,6 +2153,9 @@
       const now = new Date();
       const timeStr = `Today - ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}${now.getHours() >= 12 ? 'pm' : 'am'}`;
 
+      // Push order to shared kitchen queue
+      pushSharedOrder(orderId, [{ name: `${foodName} (${restaurant})`, qty: 1 }], totalCost, 'partner');
+
       // Insert at the beginning of Recent Orders list
       const countdownMins = 10; // Simulated delivery time
       
@@ -1906,7 +2193,6 @@
       closeOutsideOrderModal();
       
       // Clear inputs
-      document.getElementById('outside-food-name').value = '';
       document.getElementById('outside-food-cost').value = '';
 
       openModal("Partner Order Placed!", `Your order from ${restaurant} for "${foodName}" has been successfully placed. It is scheduled to arrive at the tuckshop counters in ~10 minutes. Handling fee: $${fee.toFixed(2)}.`);
