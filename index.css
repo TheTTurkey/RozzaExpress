@@ -641,6 +641,7 @@ main {
   height: 100%;
   object-fit: cover;
   transition: transform var(--transition-normal);
+  background-color: #f1f5f9;
 }
 
 .card-item:hover .card-image {
@@ -1646,6 +1647,7 @@ main {
   border-radius: var(--radius-md);
   object-fit: cover;
   flex-shrink: 0;
+  background-color: #f1f5f9;
 }
 
 .cart-item-details {

@@ -364,7 +364,7 @@
   .fulfillment-btn.active { background: rgba(225,29,72,.08); border-color: #e11d48; color: #e11d48; }
   .office-fav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 280px; overflow-y: auto; }
   .fav-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .fav-card img { height: 36px; width: 36px; object-fit: cover; border-radius: 8px; }
+  .fav-card img { height: 36px; width: 36px; object-fit: cover; border-radius: 8px; background-color: #f1f5f9; }
   .fav-card-info p { font-size: 12px; font-weight: 700; color: #0f172a; }
   .fav-card-info span { font-size: 10px; font-family: monospace; color: #e11d48; font-weight: 700; }
   .btn-add-fav { background: #ffffff; border: 1px solid #cbd5e1; color: #e11d48; border-radius: 8px; padding: 5px 10px; font-size: 10px; font-weight: 700; }
@@ -977,6 +977,9 @@
 </div>
 
 <script>
+const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-size='48' fill='%2394a3b8'%3E🍽️%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-size='14' font-weight='600' fill='%2394a3b8'%3EImage unavailable%3C/text%3E%3C/svg%3E";
+function handleImgError(img) { img.onerror = null; img.src = FALLBACK_IMG; }
+
 let isEditingShift = false;
 
 function editShiftOfficers() {
@@ -1758,7 +1761,7 @@ function renderOrdering() {
   }
   const favs = menuItems.filter(m => m.isActive && (m.staffCategory === 'Drinks' || m.staffCategory === 'Treats'));
   const el = document.getElementById('office-favs');
-  el.innerHTML = favs.map(m => `<div class="fav-card"><img src="${m.image}" alt="${m.name}"><div class="fav-card-info"><p>${m.name}</p><span>$${m.price.toFixed(2)}</span></div><button class="btn-add-fav" onclick="addToFacCart('${m.id}')">+ ADD</button></div>`).join('') || '<p style="color:#475569;font-size:12px">No favourites available</p>';
+  el.innerHTML = favs.map(m => `<div class="fav-card"><img src="${m.image}" alt="${m.name}" onerror="handleImgError(this)"><div class="fav-card-info"><p>${m.name}</p><span>$${m.price.toFixed(2)}</span></div><button class="btn-add-fav" onclick="addToFacCart('${m.id}')">+ ADD</button></div>`).join('') || '<p style="color:#475569;font-size:12px">No favourites available</p>';
   updateFacCart();
 }
 

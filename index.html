@@ -698,6 +698,10 @@
   <!-- APP JAVASCRIPT STATE CONTROLLER -->
   <!-- ============================================ -->
   <script>
+    // Fallback placeholder for broken images
+    const FALLBACK_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-size='48' fill='%2394a3b8'%3E🍽️%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' font-family='system-ui,sans-serif' font-size='14' font-weight='600' fill='%2394a3b8'%3EImage unavailable%3C/text%3E%3C/svg%3E";
+    function handleImgError(img) { img.onerror = null; img.src = FALLBACK_IMG; }
+
     // State initialization
     let state = {
       isLoggedIn: false,
@@ -1326,7 +1330,7 @@
           <div class="card-item" onclick="addDealToCart('${deal.id}')" style="cursor: pointer;">
             <div class="card-image-wrapper">
               <span class="card-badge-overlay ${deal.tagClass}">${deal.tag}</span>
-              <img src="${deal.image}" alt="${deal.name}" class="card-image">
+              <img src="${deal.image}" alt="${deal.name}" class="card-image" onerror="handleImgError(this)">
             </div>
             <div class="card-content">
               <h4 class="card-title">${deal.name}</h4>
@@ -1462,7 +1466,7 @@
           <div class="card-item ${isOutOfStock ? 'out-of-stock' : ''}">
             <div class="card-image-wrapper">
               ${badgeHtml}
-              <img src="${prod.image}" alt="${prod.name}" class="card-image">
+              <img src="${prod.image}" alt="${prod.name}" class="card-image" onerror="handleImgError(this)">
             </div>
             <div class="card-content">
               <h4 class="card-title">${prod.name}</h4>
@@ -1554,7 +1558,7 @@
           <div class="card-item reward-card ${isLocked ? 'locked' : ''}">
             <div class="card-image-wrapper">
               ${overlayHtml}
-              <img src="${rew.image}" alt="${rew.name}" class="card-image">
+              <img src="${rew.image}" alt="${rew.name}" class="card-image" onerror="handleImgError(this)">
             </div>
             <div class="card-content" style="padding:16px;">
               <h4 class="card-title" style="font-size:14px; margin-bottom:4px;">${rew.name}</h4>
@@ -1835,7 +1839,7 @@
 
           cartList.innerHTML += `
             <div class="cart-item-row">
-              <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+              <img src="${item.image}" alt="${item.name}" class="cart-item-image" onerror="handleImgError(this)">
               <div class="cart-item-details">
                 <span class="cart-item-name">${item.name}</span>
                 <span class="cart-item-price">$${itemPrice.toFixed(2)}</span>
