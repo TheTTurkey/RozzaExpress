@@ -1424,6 +1424,21 @@ function showLoginErr(msg) {
 }
 function doLogout() {
   sessionStorage.removeItem('staffAuth');
+  
+  // Revert menu, orders, shift officers, and notes to defaults for demonstration purposes
+  localStorage.removeItem('rozza_express_menu');
+  localStorage.removeItem('rozza_express_orders');
+  localStorage.removeItem('rozza_express_notes');
+  localStorage.removeItem('rozza_express_shift_officers');
+  
+  // Also clear student state so that the demo resets completely on next login
+  localStorage.removeItem('rozza_express_state');
+  
+  // Reset in-memory values to defaults
+  menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+  orders = JSON.parse(JSON.stringify(DEFAULT_ORDERS));
+  handoverNotes = JSON.parse(JSON.stringify(DEFAULT_NOTES));
+  
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('logout-btn').style.display = 'none';
   document.getElementById('staff-pass').value = '';
