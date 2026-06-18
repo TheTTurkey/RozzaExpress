@@ -1411,7 +1411,8 @@ function doLogin() {
   const pass = document.getElementById('staff-pass').value.trim();
   const errEl = document.getElementById('login-err');
   if (!user) { showLoginErr('Please enter your staff username.'); return; }
-  if (user !== 'mr john') { showLoginErr('Access denied. Incorrect staff username.'); return; }
+  const allowedUsers = ['mr john', 'joseph reynolds', 'admin'];
+  if (!allowedUsers.includes(user)) { showLoginErr('Access denied. Incorrect staff username.'); return; }
   if (pass !== 'pass2026') { showLoginErr('Access denied. Incorrect staff password.'); return; }
   sessionStorage.setItem('staffAuth','1');
   document.getElementById('login-overlay').style.display = 'none';
